@@ -1,0 +1,14 @@
+{
+"companyName": "Proper Six",
+"productName": "Egpytion gods slot",
+"dataUrl": "Egyptian gods slots.data.unityweb",
+"wasmCodeUrl": "Egyptian gods slots.wasm.code.unityweb",
+"wasmFrameworkUrl": "Egyptian gods slots.wasm.framework.unityweb",
+"TOTAL_MEMORY": 268435456,
+"graphicsAPI": ["WebGL 2.0", "WebGL 1.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"backgroundUrl": "Egyptian gods slots.jpg",
+"splashScreenStyle": "Dark",
+"backgroundColor": "#FFFFFF",
+"cacheControl": {"default": "must-revalidate"}
+}

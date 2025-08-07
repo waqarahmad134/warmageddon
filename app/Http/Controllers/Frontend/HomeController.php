@@ -56,6 +56,13 @@ class HomeController extends Controller {
         Session::put('aff_id',$aff_id);
         return redirect()->route('index');
     }
+
+    
+    public function comingSoon(Request $request){
+        return view('frontend.home.comingsoon');
+    }
+
+
     public function index(Request $request) {
         if ($request->query('stag'))
         {

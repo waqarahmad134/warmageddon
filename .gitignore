@@ -54,6 +54,5 @@ Thumbs.db
 /composer.lock/
 /.env/
 /games/
-/game/
 /stoarge/
 package-lock.json

@@ -62,7 +62,8 @@ Route::get('recordSaving/{id}','Controller@recordSaving');
 Route::group([ 'middleware' => ['cr'] ],function(){
     Route::get('/clear-cache', 'HomeController@cache_clear');
     // page
-    Route::get('/', 'Frontend\HomeController@index')->name('index');
+    // Route::get('/', 'Frontend\HomeController@index')->name('index');
+    Route::get('/', 'Frontend\HomeController@comingSoon')->name('index');
     // testing games
     Route::get('/softwiss-games', 'Frontend\HomeController@index1');
     Route::get('website/{affiliate_id}/{type}/{source}', 'Frontend\HomeController@visit');
