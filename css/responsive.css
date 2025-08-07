@@ -1,0 +1,2557 @@
+@media (max-width:1600px) {
+    .sidebarMenuInner li {
+        padding: 0 8px
+    }
+    .video-wrapper {
+        height: 365px
+    }
+    .video-text {
+        height: 365px
+    }
+    #pro-token-part .pro-token-item .list-last-text h3 {
+        font-size: 22px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        font-size: 16px;
+        padding-bottom: 6px
+    }
+    #latestnews-sub .latestnews-text .card-text h4 {
+        padding-bottom: 10px
+    }
+    #latestnews-sub .big-text {
+        height: 600px;
+    }
+}
+
+@media (max-width:1440px) {
+    .logo-main img {
+        max-height: 75px
+    }
+    
+    #blockchain-main {
+        padding: 40px 0
+    }
+    #biggest .biggest-box p {
+        padding: 0 20px 30px 20px
+    }
+    .gallery-wraper {
+        height: 400px
+    }
+    .video-wrapper {
+        height: 350px
+    }
+    .video-text {
+        height: 350px
+    }
+    .img-overlay p {
+        font-size: 16px;
+        line-height: 24px
+    }
+    #biggest .biggest-box {
+        padding: 90px 0 110px 0
+    }
+    #biggest .biggest-box .biggest-text h4 {
+        padding: 35px 0 25px 0
+    }
+    #latestnews-sub .latestnews-box {
+        height: 450px
+    }
+    #latestnews-sub .latestnews-text {
+        height: 450px
+    }
+    #latestnews-sub .big-text {
+        height: 500px;
+    }
+    #latestnews-sub .latestnews-text .latestnews-text-sub h4 {
+        font-size: 24px;
+        padding-bottom: 20px
+    }
+    #latestnews-sub .latestnews-text .latestnews-text-sub p {
+        font-size: 16px;
+        line-height: 26px
+    }
+    #social_media {
+        padding: 80px 0
+    }
+    #benefits {
+        padding: 90px 0
+    }
+    #timeline {
+        padding: 90px 0
+    }
+    #club-gallery {
+        padding: 90px 0
+    }
+    #cradit {
+        padding: 90px 0
+    }
+    #club-ex-product {
+        padding: 90px 0
+    }
+    #upcomingproduct {
+        padding: 90px 0
+    }
+    #pru-tokens-details .pru-tokens-details-box {
+        height: 350px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 28px;
+        padding-bottom: 0
+    }
+    #pro-token-part .pro-token-item .list-last-text p {
+        font-size: 12px;
+        padding-top: 0
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        padding-bottom: 0
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 28px;
+        padding-bottom: 5px
+    }
+    #pro-token-part .pro-token-item .list-last-text h3 {
+        font-size: 22px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        font-size: 16px;
+        padding-bottom: 6px
+    }
+    #pro-token-part .pro-token-item {
+        height: 520px
+    }
+    
+    .bottom-pupup {
+    width: 350px; }
+
+  .bottom-pupup .bottom-pupup-box h3 {
+    font-size: 24px; }
+
+  .bottom-pupup .bottom-pupup-box p {
+    padding: 14px 0px;
+    font-size: 15px; }
+
+  .bottom-pupup .btn {
+    max-width: 155px; }
+}
+
+@media (max-width:1280px) {
+    .navbar-expand-lg .navbar-nav .nav-item .nav-link {
+      font-size: 16px;
+    }
+
+    .navbar-expand-lg .navbar-nav .nav-item {
+      padding: 0px 14px;
+    }
+
+    .navbar-expand-lg .navbar-nav .nav-item .dropdown-menu {
+      top: 80%;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    
+    #banner-main .learn-main {
+        right: -45px;
+    }
+    #banner-main .learn-main a {
+        font-size: 20px;
+        line-height: 18px;
+    }
+    #blockchain-main {
+        padding: 0 0
+    }
+    .video-wrapper {
+        height: 300px
+    }
+    .video-text {
+        height: 300px
+    }
+    .video-text p {
+        font-size: 16px
+    }
+    .gallery-wraper {
+        height: 350px
+    }
+    #biggest .biggest-box .biggest-text img {
+        width: 215px
+    }
+    #biggest .biggest-box .biggest-text h4 {
+        padding: 30px 0 20px 0;
+        font-size: 32px
+    }
+    #biggest .biggest-box p {
+        font-size: 20px
+    }
+    #latestnews .lastestnews-head h3 {
+        font-size: 40px;
+        padding: 70px 0
+    }
+    #latestnews-sub .latestnews-box {
+        height: 400px
+    }
+    #latestnews-sub .latestnews-text {
+        height: 400px
+    }
+    #latestnews-sub .big-text {
+        height: 450px;
+    }
+    #latestnews-sub .latestnews-text .latestnews-text-sub {
+        width: 80%
+    }
+    #philosophy {
+        padding: 90px 0
+    }
+    #teampart {
+        padding: 90px 0
+    }
+    #social_media {
+        padding: 70px 0
+    }
+    #social_media .social_media_wrapper .club-membership-img {
+        height: 400px
+    }
+    #benefits {
+        padding: 80px 0
+    }
+    #timeline {
+        padding: 80px 0
+    }
+    #club-gallery {
+        padding: 80px 0
+    }
+    #cradit {
+        padding: 80px 0
+    }
+    #club-ex-product {
+        padding: 80px 0
+    }
+    #upcomingproduct {
+        padding: 80px 0
+    }
+    #pru-tokens-details .pru-tokens-details-box {
+        height: 370px
+    }
+    #pro-token-part .pro-token-item {
+        height: 425px
+    }
+    #pro-token-part .big-txt-box {
+		height: 640px;
+	}
+	#pro-token-part .big-item {
+		height: 540px;
+	}
+    #pro-token-part .pro-token-item .pro-token-item-text h5 {
+        font-size: 20px
+    }
+    #latestnews-sub .latestnews-text .card-text h4 {
+        padding-bottom: 10px
+    }
+    #latestnews-sub .latestnews-text .card-text p {
+        line-height: 22px
+    }
+    
+    .bottom-pupup {
+    width: 340px; }
+
+  .bottom-pupup .bottom-pupup-box h3 {
+    font-size: 22px; }
+
+  .bottom-pupup .bottom-pupup-box p {
+    padding: 12px 0px;
+    font-size: 14px; }
+
+  .bottom-pupup .btn {
+    max-width: 150px; }
+}
+
+@media (min-width:992px) and (max-width:1199px) {
+      .navbar-expand-lg .navbar-nav .nav-item .nav-link {
+    font-size: 16px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item {
+    padding: 0px 10px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .dropdown-menu {
+    top: 80%;
+    left: 50%;
+    transform: translateX(-50%); }
+    
+    #banner-main {
+        padding: 140px 0 50px 0
+    }
+    .banner-header .all-header h2 {
+        font-size: 40px;
+        line-height: 40px
+    }
+    .blockchain-left img {
+        max-width: 320px
+    }
+    .blockchain-right {
+        padding: 40px 0 30px 0
+    }
+    #biggest .biggest-box p {
+        font-size: 18px;
+        padding: 0 15px 30px 15px
+    }
+    #club-main {
+        padding: 40px 0 40px 0
+    }
+    .club-header {
+        padding: 50px 35px
+    }
+    .video-text h3 {
+        font-size: 22px
+    }
+    .video-text p {
+        font-size: 13px;
+        line-height: 19px
+    }
+    .video-wrapper {
+        height: 230px
+    }
+    .video-text {
+        height: 230px
+    }
+    .gallery-wraper {
+        height: 230px
+    }
+    #biggest .biggest-box {
+        padding: 70px 0 90px 0
+    }
+    #biggest .biggest-box .biggest-text img {
+        width: 190px
+    }
+    #biggest .biggest-box .biggest-text h4 {
+        padding: 25px 0 20px 0;
+        font-size: 26px
+    }
+    #biggest .biggest-box .biggest-text .btn {
+        padding: 9px 0;
+        font-size: 14px
+    }
+    #latestnews {
+        padding: 80px 0 100px 0
+    }
+    #latestnews .lastestnews-head h3 {
+        font-size: 35px
+    }
+    #latestnews a i {
+        bottom: 20px;
+        font-size: 35px
+    }
+    #latestnews-sub .latestnews-box {
+        height: 360px
+    }
+    #latestnews-sub .latestnews-text {
+        height: 360px
+    }
+    #latestnews-sub .big-text {
+        height: 410px;
+    }
+    #contact {
+        padding: 65px 0
+    }
+    #contact .contact-box .contact-header h3 {
+        font-size: 46px;
+        padding-bottom: 30px
+    }
+    #contact .contact-box .half {
+        width: 49.2%
+    }
+    #membership {
+        padding: 65px 0
+    }
+    #membership .membership-box h5 {
+        margin-bottom: 35px;
+        font-size: 29px
+    }
+    #membership .membership-box .btn {
+        max-width: 350px;
+        padding: 12px 0
+    }
+    #footer .footer-box ul li a {
+    width: 38px;
+    height: 39px;
+    line-height: 39px; }
+    #footer .footer-box .subscribe .form-control {
+        width: 62%;
+    }
+
+    #footer .footer-box .subscribe .footer-btn {
+        width: 36%;
+    }
+    #philosophy {
+        padding: 70px 0
+    }
+    #teampart {
+        padding: 70px 0
+    }
+    #joinour {
+        padding: 170px 0
+    }
+    .club-header-all h3 {
+        font-size: 36px;
+        padding-bottom: 20px
+    }
+    #social_media {
+        padding: 60px 0 70px
+    }
+    #social_media .social_media_wrapper .club-membership-img {
+        height: 340px
+    }
+    #social_media .social_media_wrapper .social-media-header {
+        margin-bottom: -15px
+    }
+    #benefits {
+        padding: 70px 0
+    }
+    #benefits .benefits-wrapper {
+        padding: 50px 30px
+    }
+    #timeline {
+        padding: 70px 0
+    }
+    #timeline .timeline-wrapper {
+        padding: 50px 15px
+    }
+    #timeline .timeline-item .timeline-item-box {
+        height: 380px
+    }
+    #timeline .timeline-pic {
+        height: 145px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 140px;
+        width: 140px
+    }
+    #club-gallery {
+        padding: 70px 0
+    }
+    #club-gallery .gallery-wrapper .gallery-height {
+        height: 420px
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 46.6%
+    }
+    #cradit {
+        padding: 70px 0
+    }
+    #cradit .cradit-wrapper {
+        padding: 50px 35px
+    }
+    #social_media .social_media_wrapper .social-media-img {
+        height: 310px
+    }
+    #club-ex-product {
+        padding: 70px 0
+    }
+    #club-ex-product .club-ex-product-wrapper {
+        padding: 50px 30px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box {
+        height: 395px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 130px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 175px
+    }
+    #upcomingproduct {
+        padding: 70px 0
+    }
+    #upcomingproduct .upcomingproduct-wrapper {
+        padding: 50px 30px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text h3 {
+        font-size: 22px;
+        padding-bottom: 8px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text p {
+        font-size: 13px;
+        padding-bottom: 12px;
+        line-height: 20px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text a {
+        font-size: 13px;
+        margin-left: 25px
+    }
+    #pru-tokens-details .pru-tokens-details-box {
+        height: 340px
+    }
+    #pro-token-part .pro-token-item {
+        height: 550px
+    }
+    #pro-token-part .big-txt-box {
+		height: 640px;
+	}
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 22px;
+        padding-bottom: 5px
+    }#pro-token-part .big-item .pro-token-item-text h3 {
+        font-size: 16px;
+    }
+    #pro-token-part .pro-token-item .list-last-text p {
+        font-size: 12px;
+        padding-top: 0;
+        line-height: 16px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        font-size: 12px;
+        padding-bottom: 0
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li {
+        line-height: 18px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-btn .btn {
+        max-width: 140px;
+        padding: 5px 5px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub h4 {
+        font-size: 22px;
+        padding-bottom: 12px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub p {
+        font-size: 14px;
+        line-height: 22px
+    }
+    #latestnews-sub .latestnews-text .card-text h4 {
+        font-size: 22px;
+        padding-bottom: 8px
+    }
+    #latestnews-sub .latestnews-text .card-text p {
+        font-size: 14px;
+        line-height: 20px
+    }
+    #latestnews-sub .latestnews-text .latestnews-text-sub .note-text {
+        font-size: 12px;
+        line-height: 14px
+    }
+    
+  .modal-home-top .modal-dialog {
+    max-width: 720px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-header a img {
+    margin: 20px 0px 8px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .form-control {
+    margin: 10px 0px 10px 5px;
+    width: 32.2%; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .modal-body-company .company-main-box {
+    width: 48.9%; }
+    
+    .bottom-pupup {
+    width: 320px; }
+
+  .bottom-pupup .bottom-pupup-box h3 {
+    font-size: 21px; }
+
+  .bottom-pupup .bottom-pupup-box p {
+    font-size: 13px; }
+}
+
+@media (min-width:768px) and (max-width:991px) {
+    #navbar-main {
+    background-color: black;
+    padding: 15px 0px; }
+
+  .navbar-nav {
+    padding-top: 20px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item {
+    padding: 0px 0px 15px 0px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .nav-link {
+    padding: 2px 0px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .link-btn-no-bg {
+    padding: 8px 15px;
+    text-align: center; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .dropdown-menu {
+    left: auto;
+    transform: none; }
+
+  .blink-bg-menu {
+    justify-content: left; }
+    #banner-main {
+        padding: 140px 0 20px 0
+    }
+    .banner-header .all-header h2 {
+        font-size: 40px;
+        line-height: 40px
+    }
+    .blockchain-left img {
+        max-width: 300px
+    }
+    .blockchain-right {
+        padding: 15px 0 60px 0
+    }
+    #club-main {
+        padding: 40px 0 40px 0
+    }
+    .club-header {
+        padding: 40px 35px
+    }
+    #video-main {
+        padding: 40px 0 70px
+    }
+    .video-wrapper {
+        height: 360px;
+        margin-bottom: 40px
+    }
+    .video-text {
+        height: 300px
+    }
+    .video-text::after {
+        width: 100%
+    }
+    .swiper-slide {
+        width: 360px;
+        height: 360px
+    }
+    .gallery-wraper {
+        height: 250px
+    }
+    #biggest .biggest-box {
+        padding: 65px 0 80px 0;
+        background: #ffffffad
+    }
+    #latestnews {
+        padding: 70px 0 100px 0
+    }
+    #latestnews .lastestnews-head h3 {
+        font-size: 32px
+    }
+    #latestnews a i {
+        bottom: 25px;
+        font-size: 32px
+    }
+    #latestnews-sub .latestnews-box {
+        height: 270px
+    }
+    #latestnews-sub .latestnews-text {
+        height: 270px
+    }
+    #latestnews-sub .latestnews-text .latestnews-text-sub h4 {
+        font-size: 20px;
+        padding-bottom: 15px
+    }
+    #latestnews-sub .latestnews-text .latestnews-text-sub p {
+        font-size: 14px
+    }
+    #contact {
+        padding: 50px 0 60px
+    }
+    #contact .contact-box .contact-header h3 {
+        font-size: 34px;
+        padding-bottom: 30px
+    }
+    #contact .contact-box .half {
+        width: 49.2%
+    }
+    #contact .contact-box .form-control {
+        padding: 8px 20px;
+        height: 45px
+    }
+    #contact .contact-box .btn {
+        font-size: 17px;
+        margin: 20px 0 0 0
+    }
+    #membership {
+        padding: 50px 0
+    }
+    #membership .membership-box {
+        padding: 55px 35px
+    }
+    #membership .membership-box h5 {
+        margin-bottom: 30px;
+        font-size: 22px
+    }
+    #membership .membership-box .btn {
+        max-width: 345px;
+        padding: 12px 0
+    }
+    #footer .footer-box img {
+        margin-top: 0;
+    }
+    #footer .footer-box {
+        padding-top: 30px;
+    }
+    #footer .footer-bottom {
+        padding: 25px 0px;
+        margin-top: 25px;
+    }
+    #footer .footer-bottom .footer-bottom-box {
+        text-align: center;
+    }
+    #footer .footer-bottom .footer-bottom-box a {
+    margin-bottom: 0px; }
+
+  #footer .footer-bottom .footer-bottom-right {
+    text-align: center;
+    padding-top: 10px; }
+
+  #footer .footer-bottom .footer-bottom-right br {
+    display: none; }
+    #philosophy {
+        padding: 60px 0
+    }
+    #philosophy .philosophy-box {
+        padding: 40px 30px
+    }
+    #philosophy .philosophy-box p {
+        font-size: 14px
+    }
+    #philosophy .philosophy-box h3 {
+        font-size: 36px;
+        padding-bottom: 45px
+    }
+    #philosophy .philosophy-box h3:before {
+        bottom: 30px
+    }
+    #joinour {
+        padding: 160px 0
+    }
+    #joinour a i {
+        bottom: 50px;
+        font-size: 40px
+    }
+    #joinour .joinour-box h3 {
+        font-size: 32px
+    }
+    #teampart {
+        padding: 60px 0
+    }
+    #teampart .teampart-background {
+        padding: 50px 20px 75px
+    }
+    #teampart .teampart-header {
+        padding-bottom: 35px
+    }
+    #teampart .teampart-header h3 {
+        font-size: 36px;
+        padding-bottom: 40px
+    }
+    #teampart .teampart-header h3:before {
+        bottom: 25px
+    }
+    #teampart .teampart-header p {
+        font-size: 14px;
+        line-height: 25px
+    }
+    #teampart .teampart-box .teampart-img img {
+        margin: 19px 0 0 19px
+    }
+    #teampart .teampart-box:hover .teampart-img img {
+        margin: 19px 0 0 0
+    }
+    #teampart .teampart-box .teampart-overlay {
+        bottom: -60px
+    }
+    #teampart .teampart-box .teampart-overlay h5 {
+        font-size: 15px
+    }
+    #teampart .teampart-box .teampart-overlay p {
+        font-size: 13px;
+        padding: 3px 0
+    }
+    #teampart .teampart-box .teampart-overlay a {
+        width: 30px;
+        height: 30px;
+        line-height: 30px
+    }
+    #teampart .teampart-box .teampart-overlay a i {
+        font-size: 15px
+    }
+    #latestnews-sub .member-main {
+        height: 290px
+    }
+    #latestnews-sub .member-box {
+        height: 290px
+    }
+    #latestnews-sub .big-text {
+        height: 340px;
+    }
+    .club-header-all h3 {
+        font-size: 34px;
+        padding-bottom: 20px
+    }
+    #social_media {
+        padding: 50px 0 60px
+    }
+    #social_media .membership-club-wrapper {
+        padding: 40px 25px
+    }
+    #social_media .social_media_wrapper .social-media-header {
+        margin-bottom: -25px
+    }
+    #social_media .social_media_wrapper .club-membership-img {
+        height: 350px
+    }
+    #benefits {
+        padding: 60px 0
+    }
+    #benefits .benefits-wrapper {
+        padding: 40px 25px
+    }
+    #benefits .benefits-wrapper .benefits-header {
+        margin-bottom: -25px
+    }
+    #benefits .benefits-wrapper .benefits-box .benefits-icon {
+        width: 18%
+    }
+    #benefits .benefits-wrapper .benefits-box .benefits-icon i {
+        font-size: 25px;
+        padding-left: 0
+    }
+    #benefits .benefits-wrapper .benefits-box .benefits-text {
+        width: 82%
+    }
+    #timeline {
+        padding: 60px 0
+    }
+    #timeline .timeline-wrapper {
+        padding: 40px 30px
+    }
+    #timeline .timeline-item:after {
+        border-width: 25px;
+        margin-left: -25px
+    }
+    #timeline .timeline-item .timeline-item-box {
+        height: 350px
+    }
+    #timeline .timeline-item .timeline-item-box .timeline-item-text h5 {
+        font-size: 20px
+    }
+    #timeline .timeline-item .timeline-item-box .timeline-item-text p {
+        line-height: 20px
+    }
+    #timeline .timeline-pic {
+        height: 115px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 110px;
+        width: 110px
+    }
+    #club-gallery {
+        padding: 50px 0
+    }
+    #club-gallery .gallery-wrapper .sm-mar-b {
+        margin-bottom: 30px
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 47.8%
+    }
+    #club-gallery .gallery-wrapper .gallery-height {
+        height: 480px
+    }
+    #cradit {
+        padding: 50px 0
+    }
+    #cradit .cradit-wrapper {
+        padding: 40px 35px
+    }
+    #social_media .social_media_wrapper .social-media-img {
+        height: 300px
+    }
+    #club-ex-product {
+        padding: 50px 0
+    }
+    #club-ex-product .club-ex-product-wrapper {
+        padding: 40px 30px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 100px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 125px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box {
+        height: 320px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box .ex-product-item-text h5 {
+        font-size: 18px;
+        padding-bottom: 12px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box .ex-product-item-text p {
+        font-size: 12px;
+        line-height: 20px
+    }
+    #upcomingproduct {
+        padding: 50px 0
+    }
+    #upcomingproduct .upcomingproduct-wrapper {
+        padding: 40px 30px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text h3 {
+        font-size: 16px;
+        padding-bottom: 5px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text p {
+        font-size: 12px;
+        padding-bottom: 10px;
+        line-height: 18px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text a {
+        font-size: 12px;
+        margin-left: 25px
+    }
+    #pru-tokens-details .pru-tokens-details-arrow-top:after {
+        border-width: 17px;
+        margin-left: -17px
+    }
+    #pru-tokens-details .pru-tokens-details-arrow-bottom:after {
+        border-width: 17px;
+        margin-left: -17px
+    }
+    #pru-tokens-details .pru-tokens-details-box {
+        height: 330px
+    }
+    #pro-token-part .pro-token-item {
+        height: 350px
+    }
+	#pro-token-part .big-item {
+		height: 500px;
+	}
+    #pro-token-part .pro-token-item .pro-token-item-text {
+        width: 90%
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 20px;
+        padding-bottom: 10px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h5 {
+        font-size: 16px;
+        padding-bottom: 10px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        font-size: 13px;
+        padding-bottom: 2px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-btn .btn {
+        margin: 10px 0 0 0;
+        max-width: 170px;
+        padding: 6px 5px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub h4 {
+        font-size: 18px;
+        padding-bottom: 8px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub p {
+        font-size: 12px;
+        line-height: 18px
+    }
+    #latestnews-sub .latestnews-text .card-text h4 {
+        padding-bottom: 5px
+    }
+    #latestnews-sub .latestnews-text .card-text p {
+        line-height: 15px
+    }
+    #latestnews-sub .latestnews-text .latestnews-text-sub .note-text {
+        font-size: 11px;
+        line-height: 12px
+    }
+    
+    .modal-home-top .modal-dialog {
+    max-width: 640px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-header a img {
+    margin: 20px 0px 8px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .form-control {
+    margin: 10px 0px 10px 5px;
+    width: 32.3%; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .modal-body-company .company-main-box {
+    display: block; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .modal-body-company .company-main-box {
+    width: 100%;
+    margin: 0px 0px 20px 0px; }
+    
+    .bottom-pupup {
+    width: 320px; }
+
+  .bottom-pupup .bottom-pupup-box h3 {
+    font-size: 20px; }
+
+  .bottom-pupup .bottom-pupup-box p {
+    font-size: 13px; }
+}
+
+@media (min-width:576px) and (max-width:767px) {
+    #navbar-main {
+        padding: 15px 0px;
+    }
+    .banner-manu-black {
+        padding: 8px 0px !important;
+    }
+    #navbar-main {
+    background-color: black;
+    padding: 15px 0px; }
+
+  .navbar-nav {
+    padding-top: 20px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item {
+    padding: 0px 0px 15px 0px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .nav-link {
+    padding: 2px 0px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .link-btn-no-bg {
+    padding: 8px 15px;
+    text-align: center; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .dropdown-menu {
+    left: auto;
+    transform: none; }
+
+  .blink-bg-menu {
+    justify-content: left; }
+    #banner-main {
+        padding: 140px 0 20px 0
+    }
+    #banner-main .learn-main {
+        right: -28px;
+        width: 115px;
+        padding: 8px 15px;
+    }
+    #banner-main .learn-main a {
+        font-size: 18px;
+    }
+    .banner-header .all-header h2 {
+        font-size: 40px;
+        line-height: 40px
+    }
+    .blockchain-left img {
+        max-width: 300px
+    }
+    .blockchain-right {
+        padding: 15px 0 60px 0
+    }
+    #club-main {
+        padding: 40px 0 40px 0
+    }
+    .club-header {
+        padding: 40px 30px
+    }
+    #video-main {
+        padding: 30px 0 70px
+    }
+    .video-wrapper {
+        height: 265px;
+        margin-bottom: 30px
+    }
+    .video-text {
+        height: 250px
+    }
+    .video-text::after {
+        width: 100%
+    }
+    .swiper-slide {
+        width: 350px;
+        height: 350px
+    }
+    .gallery-wraper {
+        height: 240px
+    }
+    #biggest .biggest-box {
+        padding: 50px 0;
+        background: #ffffffad
+    }
+    #biggest .biggest-box .biggest-text img {
+        width: 190px
+    }
+    #biggest .biggest-box .biggest-text h4 {
+        padding: 25px 0 20px 0;
+        font-size: 28px
+    }
+    #biggest .biggest-box .biggest-text .btn {
+        padding: 8px 0
+    }
+    #latestnews {
+        padding: 40px 0 65px 0
+    }
+    #latestnews .lastestnews-head h3 {
+        font-size: 26px;
+        padding: 40px 0
+    }
+    #latestnews a i {
+        bottom: 20px;
+        font-size: 26px
+    }
+    #latestnews-sub .latestnews-box {
+        height: 300px
+    }
+    #latestnews-sub .latestnews-text {
+        height: 280px
+    }
+    #latestnews-sub .big-text {
+        height: 320px;
+    }
+    #contact {
+        padding: 50px 0
+    }
+    #contact .contact-box {
+        padding: 40px 30px
+    }
+    #contact .contact-box .contact-header h3 {
+        font-size: 30px;
+        padding-bottom: 30px
+    }
+    #contact .contact-box .form-control {
+        height: 45px
+    }
+    #contact .contact-box .half {
+        width: 100%;
+        margin-right: 0
+    }
+    #membership {
+        padding: 50px 0
+    }
+    #membership .membership-box {
+        padding: 40px 20px
+    }
+    #membership .membership-box h5 {
+        margin-bottom: 25px;
+        font-size: 22px
+    }
+    #membership .membership-box .btn {
+        font-size: 14px;
+        max-width: 340px;
+        padding: 12px 0
+    }
+    #footer .footer-box img {
+        margin-top: 0;
+    }
+    #footer .footer-box {
+        padding-top: 30px;
+    }
+    #footer .footer-bottom {
+        padding: 25px 0px;
+        margin-top: 25px;
+    }
+    #footer .footer-bottom .footer-bottom-box {
+        text-align: center;
+    }
+    #footer .footer-bottom .footer-bottom-right {
+        text-align: center;
+        padding-top: 10px;
+    }
+    #footer .footer-bottom .footer-bottom-right br {
+    display: none; }
+    #philosophy {
+        padding: 50px 0
+    }
+    #philosophy .philosophy-box {
+        padding: 40px 30px
+    }
+    #philosophy .philosophy-box h3 {
+        font-size: 36px;
+        padding-bottom: 40px
+    }
+    #philosophy .philosophy-box h3:before {
+        bottom: 25px
+    }
+    #joinour {
+        padding: 140px 0
+    }
+    #joinour .joinour-box h3 {
+        font-size: 25px
+    }
+    #joinour a i {
+        bottom: 40px;
+        font-size: 35px
+    }
+    #teampart {
+        padding: 50px 0
+    }
+    #teampart .teampart-background {
+        padding: 50px 30px 70px
+    }
+    #teampart .teampart-header {
+        padding-bottom: 0;
+        margin-bottom: -15px
+    }
+    #teampart .teampart-header h3 {
+        font-size: 36px;
+        padding-bottom: 40px
+    }
+    #teampart .teampart-header h3:before {
+        bottom: 25px
+    }
+    #teampart .teampart-header p {
+        font-size: 14px;
+        line-height: 25px
+    }
+    #timeline .timeline-item {
+        margin-bottom: 30px
+    }
+    #teampart .teampart-box {
+        max-width: 300px;
+        width: 100%;
+        margin: 60px auto 0
+    }
+    #teampart .teampart-box .teampart-img img {
+        margin: 30px 0 0 30px
+    }
+    #teampart .teampart-box:hover .teampart-img img {
+        margin: 30px 0 0 0
+    }
+    #teampart .teampart-box .teampart-overlay {
+        bottom: -45px
+    }
+    #teampart .teampart-box .teampart-overlay h5 {
+        font-size: 15px
+    }
+    #teampart .teampart-box .teampart-overlay p {
+        font-size: 13px;
+        padding: 3px 0
+    }
+    #teampart .teampart-box .teampart-overlay a {
+        width: 30px;
+        height: 30px;
+        line-height: 30px
+    }
+    #teampart .teampart-box .teampart-overlay a i {
+        font-size: 15px
+    }
+    .club-header-all h3 {
+        font-size: 28px;
+        padding-bottom: 20px
+    }
+    .club-header-all p {
+        font-size: 13px;
+        line-height: 23px
+    }
+    #social_media {
+        padding: 50px 0
+    }
+    #social_media .membership-club-wrapper {
+        padding: 30px 20px
+    }
+    #social_media .social_media_wrapper .social-media-header {
+        margin-bottom: -20px
+    }
+    #social_media .social_media_wrapper .club-membership-img {
+        height: 320px;
+        margin-top: 15px
+    }
+    #benefits {
+        padding: 50px 0
+    }
+    #benefits .benefits-wrapper {
+        padding: 30px 20px
+    }
+    #benefits .benefits-wrapper .benefits-header {
+        margin-bottom: -25px
+    }
+    #benefits .benefits-wrapper .benefits-box {
+        padding: 15px;
+        margin-top: 15px
+    }
+    #timeline {
+        padding: 50px 0
+    }
+    #timeline .timeline-wrapper {
+        padding: 30px
+    }
+    #timeline .timeline-item:after {
+        border-width: 25px;
+        margin-left: -25px
+    }
+    #timeline .timeline-item .timeline-item-box {
+        height: 350px;
+        width: 100%
+    }
+    #timeline .timeline-item .timeline-item-box .timeline-item-text h5 {
+        font-size: 20px
+    }
+    #timeline .timeline-item .timeline-item-box .timeline-item-text p {
+        line-height: 20px
+    }
+    #timeline .timeline-pic {
+        height: 100px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 97px;
+        width: 97px
+    }
+    #club-gallery {
+        padding: 50px 0
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 48.5%;
+        margin-left: 15px;
+        margin-bottom: 15px
+    }
+    #club-gallery .gallery-wrapper .mar-b3 {
+        margin-bottom: 15px
+    }
+    #club-gallery .gallery-wrapper .sm-mar-b {
+        margin-bottom: 15px
+    }
+    #club-gallery .gallery-wrapper .gallery-height {
+        height: 350px
+    }
+    #cradit {
+        padding: 50px 0
+    }
+    #cradit .cradit-wrapper {
+        padding: 30px 25px
+    }
+    #social_media .social_media_wrapper .social-media-img {
+        height: 300px;
+        margin-top: 15px
+    }
+    #club-ex-product {
+        padding: 50px 0
+    }
+    #club-ex-product .club-ex-product-wrapper {
+        padding: 35px 25px
+    }
+    #club-ex-product .ex-product-slide {
+        padding-bottom: 30px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 120px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 150px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box {
+        width: 100%;
+        float: unset;
+        height: 300px
+    }
+    #upcomingproduct {
+        padding: 50px 0
+    }
+    #upcomingproduct .upcomingproduct-wrapper {
+        padding: 35px 25px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text h3 {
+        font-size: 22px;
+        padding-bottom: 15px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text p {
+        font-size: 13px;
+        padding-bottom: 12px;
+        line-height: 24px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text a {
+        font-size: 13px;
+        margin-left: 25px
+    }
+    #pru-tokens-details .pru-tokens-details-arrow-top:after {
+        top: 100%;
+        left: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-color: rgba(136, 183, 213, 0);
+        border-top-color: #1b1b1bb8;
+        border-width: 25px;
+        margin-left: -25px
+    }
+    #pru-tokens-details .pru-tokens-details-box {
+        height: 380px
+    }
+    #pru-tokens-details .token-box-mobile {
+        height: 280px
+    }
+	#pro-token-part .big-item {
+		height: 670px;
+	}
+    #pro-token-part .big-txt-box {
+        height: 400px;
+    }
+    #club-ex-product .pro-slide {
+        padding-bottom: 0;
+        padding-top: 30px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub h4 {
+        font-size: 22px;
+        padding-bottom: 14px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub p {
+        font-size: 13px;
+        line-height: 20px
+    }
+    #latestnews-sub .latestnews-text .card-text h4 {
+        padding-bottom: 5px
+    }
+    #latestnews-sub .latestnews-text .card-text p {
+        line-height: 18px
+    }
+    
+    .modal-home-top .modal-dialog {
+    max-width: 500px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-header a img {
+    margin: 20px 0px 8px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .form-control {
+    margin: 10px 0px 10px 5px;
+    width: 49%;
+    height: 44px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .modal-body-company .company-main-box {
+    display: block; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .modal-body-company .company-main-box {
+    width: 100%;
+    margin: 0px 0px 20px 0px; }
+    
+    .bottom-pupup {
+    width: 290px; }
+
+  .bottom-pupup .bottom-pupup-box h3 {
+    font-size: 20px; }
+
+  .bottom-pupup .bottom-pupup-box p {
+    font-size: 13px; }
+}
+
+@media (max-width:575px) {
+    #navbar-main {
+    background-color: black;
+    padding: 15px 0px; }
+
+  .navbar-nav {
+    padding-top: 20px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item {
+    padding: 0px 0px 15px 0px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .nav-link {
+    padding: 2px 0px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .link-btn-no-bg {
+    padding: 8px 15px;
+    text-align: center; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .dropdown-menu {
+    left: auto;
+    transform: none; }
+
+  .blink-bg-menu {
+    justify-content: left; }
+    
+    #banner-main {
+        padding: 140px 0 20px 0
+    }
+    .banner-header .all-header h2 {
+        font-size: 40px;
+        line-height: 40px
+    }
+    #banner-main .learn-main {
+        right: -28px;
+        width: 115px;
+        padding: 8px 15px;
+    }
+    #banner-main .learn-main a {
+        font-size: 18px;
+    }
+    .blockchain-left img {
+        max-width: 300px
+    }
+    .blockchain-right {
+        padding: 15px 0 60px 0
+    }
+    .blockchain-right-text h3 {
+        font-size: 20px
+    }
+    .blockchain-right-text p {
+        padding: 30px 0
+    }
+    #club-main {
+        padding: 40px 0 40px 0
+    }
+    .club-header {
+        padding: 40px 30px
+    }
+    .club-header h3 {
+		font-size: 20px;
+        padding: 0 0 35px 0
+    }
+    .club-header h1 {
+        padding: 0 0 35px 0
+    }
+    .club-header h3::after {
+        bottom: 20px
+    }
+    .club-header h1::after {
+        bottom: 20px
+    }
+    .club-header p {
+        padding: 0 0 10px 0
+    }
+    #video-main {
+        padding: 30px 0 70px
+    }
+    .video-wrapper {
+        height: 265px;
+        margin-bottom: 30px
+    }
+    .video-text {
+        height: 280px
+    }
+    .video-text::after {
+        width: 100%
+    }
+    .swiper-slide {
+        width: 350px;
+        height: 350px
+    }
+    .gallery-wraper {
+        height: 240px
+    }
+    #biggest .biggest-box {
+        padding: 50px 0;
+        background: #ffffffad
+    }
+    #biggest .biggest-box .biggest-text img {
+        width: 190px
+    }
+    #biggest .biggest-box .biggest-text h4 {
+        padding: 25px 0 20px 0;
+        font-size: 28px
+    }
+    #biggest .biggest-box .biggest-text .btn {
+        padding: 8px 0
+    }
+    #latestnews {
+        padding: 40px 0 65px 0
+    }
+    #latestnews .lastestnews-head h3 {
+        font-size: 26px;
+        padding: 40px 0
+    }
+    #latestnews a i {
+        bottom: 20px;
+        font-size: 26px
+    }
+    #latestnews-sub .latestnews-box {
+        height: 280px
+    }
+    #latestnews-sub .latestnews-text {
+        height: 280px
+    }
+    #contact {
+        padding: 50px 0
+    }
+    #contact .contact-box {
+        padding: 40px 30px
+    }
+    #contact .contact-box .contact-header h3 {
+        font-size: 30px;
+        padding-bottom: 30px
+    }
+    #contact .contact-box .form-control {
+        height: 45px
+    }
+    #contact .contact-box .half {
+        width: 100%;
+        margin-right: 0
+    }
+    #membership {
+        padding: 50px 0
+    }
+    #membership .membership-box {
+        padding: 40px 20px
+    }
+    #membership .membership-box h5 {
+        margin-bottom: 25px;
+        font-size: 22px
+    }
+    #membership .membership-box .btn {
+        font-size: 14px;
+        max-width: 340px;
+        padding: 12px 0
+    }
+    #footer .footer-box img {
+        margin-top: 0;
+    }
+    #footer .footer-box {
+        padding-top: 30px;
+    }
+    #footer .footer-bottom {
+        padding: 25px 0px;
+        margin-top: 25px;
+    }
+    #footer .footer-bottom .footer-bottom-box {
+        text-align: center;
+    }
+    #footer .footer-bottom .footer-bottom-right {
+        text-align: center;
+        padding-top: 10px;
+    }
+    #footer .footer-bottom .footer-bottom-right br {
+    display: none; }
+    #philosophy {
+        padding: 50px 0
+    }
+    #philosophy .philosophy-box {
+        padding: 40px 30px
+    }
+    #philosophy .philosophy-box h3 {
+        font-size: 36px;
+        padding-bottom: 40px
+    }
+    #philosophy .philosophy-box h3:before {
+        bottom: 25px
+    }
+    #joinour {
+        padding: 140px 0
+    }
+    #joinour .joinour-box h3 {
+        font-size: 25px
+    }
+    #joinour a i {
+        bottom: 40px;
+        font-size: 35px
+    }
+    #teampart {
+        padding: 50px 0
+    }
+    #teampart .teampart-background {
+        padding: 50px 30px 70px
+    }
+    #teampart .teampart-header {
+        padding-bottom: 0;
+        margin-bottom: -15px
+    }
+    #teampart .teampart-header h3 {
+        font-size: 36px;
+        padding-bottom: 40px
+    }
+    #teampart .teampart-header h3:before {
+        bottom: 25px
+    }
+    #teampart .teampart-header p {
+        font-size: 14px;
+        line-height: 25px
+    }
+    #teampart .teampart-box {
+        max-width: 300px;
+        width: 100%;
+        margin: 60px auto 0
+    }
+    #teampart .teampart-box .teampart-img img {
+        margin: 30px 0 0 30px
+    }
+    #teampart .teampart-box:hover .teampart-img img {
+        margin: 30px 0 0 0
+    }
+    #teampart .teampart-box .teampart-overlay {
+        bottom: -45px
+    }
+    #teampart .teampart-box .teampart-overlay h5 {
+        font-size: 15px
+    }
+    #teampart .teampart-box .teampart-overlay p {
+        font-size: 13px;
+        padding: 3px 0
+    }
+    #teampart .teampart-box .teampart-overlay a {
+        width: 30px;
+        height: 30px;
+        line-height: 30px
+    }
+    #teampart .teampart-box .teampart-overlay a i {
+        font-size: 15px
+    }
+    #latestnews-sub .member-main {
+        height: 380px
+    }
+    #latestnews-sub .big-text {
+        height: 430px;
+    }
+    .contact-height .btn {
+        max-width: 170px
+    }
+    #touch .touch-header h3 {
+        font-size: 40px
+    }
+    #touch .touch-header h4 {
+        font-size: 18px
+    }
+    #touch .footer-box .subscribe .form-control {
+        width: 50%
+    }
+    .club-header-all h3 {
+        font-size: 28px;
+        padding-bottom: 20px
+    }
+    .club-height h4 {
+        font-size: 16px;
+        padding-top: 15px
+    }
+    .club-header-all p {
+        font-size: 13px;
+        line-height: 23px
+    }
+    #social_media {
+        padding: 50px 0
+    }
+    #social_media .membership-club-wrapper {
+        padding: 30px 20px
+    }
+    #social_media .social_media_wrapper .social-media-header {
+        margin-bottom: -20px
+    }
+    #social_media .social_media_wrapper .club-membership-img {
+        height: 320px;
+        margin-top: 15px
+    }
+    #benefits {
+        padding: 50px 0
+    }
+    #benefits .benefits-wrapper {
+        padding: 30px 20px
+    }
+    #benefits .benefits-wrapper .benefits-header {
+        margin-bottom: -25px
+    }
+    #benefits .benefits-wrapper .benefits-box {
+        padding: 15px;
+        margin-top: 15px
+    }
+    #timeline {
+        padding: 50px 0
+    }
+    #timeline .timeline-wrapper {
+        padding: 30px
+    }
+    #timeline .timeline-item:after {
+        border-width: 25px;
+        margin-left: -25px
+    }
+    #timeline .timeline-item .timeline-item-box {
+        height: 350px;
+        width: 100%
+    }
+    #timeline .timeline-item .timeline-item-box .timeline-item-text h5 {
+        font-size: 20px
+    }
+    #timeline .timeline-item .timeline-item-box .timeline-item-text p {
+        line-height: 20px
+    }
+    #timeline .timeline-pic {
+        height: 135px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 134px;
+        width: 134px
+    }
+    #club-gallery {
+        padding: 50px 0
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 48.5%;
+        margin-left: 15px;
+        margin-bottom: 15px
+    }
+    #club-gallery .gallery-wrapper .mar-b3 {
+        margin-bottom: 15px
+    }
+    #club-gallery .gallery-wrapper .sm-mar-b {
+        margin-bottom: 15px
+    }
+    #club-gallery .gallery-wrapper .gallery-height {
+        height: 350px
+    }
+    #cradit {
+        padding: 50px 0
+    }
+    #cradit .cradit-wrapper {
+        padding: 30px 25px
+    }
+    #social_media .social_media_wrapper .social-media-img {
+        height: 300px;
+        margin-top: 15px
+    }
+    #club-ex-product {
+        padding: 50px 0
+    }
+    #club-ex-product .club-ex-product-wrapper {
+        padding: 35px 25px
+    }
+    #club-ex-product .ex-product-slide {
+        padding-bottom: 30px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 120px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 150px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box {
+        width: 100%;
+        float: unset;
+        height: 300px
+    }
+    #upcomingproduct {
+        padding: 50px 0
+    }
+    #upcomingproduct .upcomingproduct-wrapper {
+        padding: 35px 25px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text h3 {
+        font-size: 20px;
+        padding-bottom: 15px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text p {
+        font-size: 13px;
+        padding-bottom: 12px;
+        line-height: 24px
+    }
+    #pru-tokens-details .pru-tokens-details-box .pru-tokens-details-text a {
+        font-size: 13px;
+        margin-left: 25px
+    }
+    #pru-tokens-details .pru-tokens-details-arrow-top:after {
+        top: 100%;
+        left: 50%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+        border-color: rgba(136, 183, 213, 0);
+        border-top-color: #1b1b1bb8;
+        border-width: 25px;
+        margin-left: -25px
+    }
+    #pru-tokens-details .pru-tokens-details-box {
+        height: 340px
+    }
+    #pru-tokens-details .token-box-mobile {
+        height: 320px
+    }
+	#pro-token-part .pro-token-item {
+		height: 515px;
+	}
+    #pro-token-part .big-txt-box {
+        height: 400px;
+    }
+	#pro-token-part .big-item {
+		height: 680px;
+	}
+    #club-ex-product .pro-slide {
+        padding-bottom: 0;
+        padding-top: 30px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub h4 {
+        font-size: 22px;
+        padding-bottom: 14px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub p {
+        font-size: 13px;
+        line-height: 20px
+    }
+    
+    .modal-home-top .modal-dialog {
+    max-width: 580px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-header a img {
+    margin: 20px 0px 8px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .form-control {
+    margin: 10px 0px 10px 5px;
+    width: 49%;
+    height: 44px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .modal-body-company .company-main-box {
+    display: block; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .modal-body-company .company-main-box {
+    width: 100%;
+    margin: 0px 0px 20px 0px; }
+    
+    .bottom-pupup {
+    display: none; }
+}
+
+@media (max-width:480px) {
+      .navbar-expand-lg .navbar-nav .nav-item {
+    padding: 0px 0px 10px 0px; }
+
+  .navbar-expand-lg .navbar-nav .nav-item .nav-link {
+    font-size: 16px; }
+    .video-wrapper {
+        height: 218px;
+        margin-bottom: 30px
+    }
+    .video-text {
+        height: 220px
+    }
+    .video-text .btn {
+        font-size: 14px;
+        max-width: 140px
+    }
+    #biggest .biggest-box .biggest-text h4 {
+        font-size: 26px
+    }
+    #biggest .biggest-box .biggest-text img {
+        width: 175px
+    }
+    #membership .membership-box {
+        padding: 30px 20px
+    }
+    #membership .membership-box h5 {
+        margin-bottom: 25px;
+        font-size: 20px
+    }
+    .video-text h3 {
+        font-size: 24px
+    }
+    .video-text p {
+        font-size: 14px
+    }
+    #contact .contact-box .contact-header p {
+        font-size: 15px
+    }
+    .contact-height .btn {
+        max-width: 160px
+    }
+    #social_media .social_media_wrapper .social-media-img {
+        height: 270px
+    }
+    #benefits .benefits-wrapper .benefits-box {
+        min-height: 130px
+    }
+    #timeline .timeline-item .timeline-item-box {
+        height: 300px
+    }
+    #timeline .timeline-pic {
+        height: 110px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 107px;
+        width: 107px
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 48.2%
+    }
+    #social_media .social_media_wrapper .social-media-img {
+        height: 250px
+    }
+    #club-ex-product {
+        padding: 40px 0
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 100px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 125px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box {
+        height: 260px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box .ex-product-item-text h5 {
+        font-size: 20px;
+        padding-bottom: 12px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box .ex-product-item-text p {
+        font-size: 13px;
+        line-height: 20px
+    }
+    #club-ex-product {
+        padding: 40px 0
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 100px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 125px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box {
+        height: 260px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box .ex-product-item-text h5 {
+        font-size: 20px;
+        padding-bottom: 12px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box .ex-product-item-text p {
+        font-size: 13px;
+        line-height: 20px
+    }
+    #upcomingproduct {
+        padding: 40px 0
+    }
+    #pru-tokens-details .pru-tokens-details-arrow-top:after {
+        border-width: 20px;
+        margin-left: -20px
+    }
+    #pru-tokens-details .pru-tokens-details-arrow-bottom:after {
+        border-width: 20px;
+        margin-left: -20px
+    }
+    #pro-token-part .pro-token-item {
+		height: 515px;
+	}
+	#pro-token-part .big-item {
+		height: 680px;
+	}
+    #pro-token-part .pro-token-item .pro-token-item-text {
+        width: 85%
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 22px;
+        padding-bottom: 15px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h5 {
+        font-size: 16px;
+        padding-bottom: 10px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        font-size: 14px;
+        padding-bottom: 2px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-btn .btn {
+        margin: 10px 0 0 0;
+        max-width: 170px;
+        padding: 6px 5px
+    }
+    
+    .contact-height .btn {
+        font-size: 14px;
+        max-width: 150px;
+    }
+    
+    .cookies-box ol > li:before {
+        padding-right: 5px;
+        font-size: 18px;
+    }
+    #philosophy .cookies-box h4 {
+        font-size: 18px;
+        padding-bottom: 10px;
+    }
+    
+    #philosophy .philosophy-box p {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    .cookies-box li ol > li:before {
+        content: counters(item, ".") " ";
+        font-size: 18px;
+    }
+}
+
+@media (max-width:414px) {
+    .navbar-expand-lg .logo-main-top img {
+    max-height: 50px; }
+
+  #navbar-main {
+    padding: 13px 0px; }
+
+  .banner-manu-black {
+    padding: 8px 0px !important; }
+    .club-header p {
+        line-height: 25px
+    }
+    .video-wrapper {
+        height: 190px
+    }
+    .swiper-slide {
+        width: 300px;
+        height: 300px
+    }
+    #biggest .biggest-box {
+        padding: 45px 0
+    }
+    #biggest .biggest-box .biggest-text img {
+        width: 175px
+    }
+    #biggest .biggest-box .biggest-text h4 {
+        padding: 20px 0;
+        font-size: 22px
+    }
+    #biggest .biggest-box p {
+        font-size: 18px;
+        padding: 0 10px 30px 10px
+    }
+    #biggest .biggest-box .biggest-text .btn {
+        font-size: 14px
+    }
+    #contact {
+        padding: 45px 0
+    }
+    #contact .contact-box .contact-header h3 {
+        font-size: 26px;
+        padding-bottom: 30px
+    }
+    #membership {
+        padding: 45px 0
+    }
+    #membership .membership-box h5 {
+        margin-bottom: 25px;
+        font-size: 22px;
+        font-weight: 500
+    }
+    #membership .membership-box .btn {
+        font-size: 14px;
+        max-width: 320px;
+        padding: 12px 0
+    }
+    #philosophy {
+        padding: 45px 0
+    }
+    
+    #philosophy .philosophy-box {
+        padding: 35px 10px
+    }
+    #philosophy .philosophy-box h3 {
+        font-size: 34px
+    }
+    #philosophy .philosophy-box h5 {
+        font-size: 18px
+    }
+    #teampart .teampart-header h3 {
+        font-size: 34px
+    }
+    #timeline .timeline-item {
+        margin-bottom: 30px
+    }
+    #timeline .timeline-item .timeline-item-box {
+        height: 250px
+    }
+    #timeline .timeline-item .timeline-item-box .timeline-item-text h5 {
+        font-size: 18px
+    }
+    #timeline .timeline-item .timeline-item-box .timeline-item-text p {
+        font-size: 12px
+    }
+    #timeline .timeline-pic {
+        height: 90px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 89px;
+        width: 89px
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 47.8%
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 90px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 105px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box {
+        height: 250px
+    }
+    #pro-token-part .pro-token-item {
+        height: 380px
+    }
+	#pro-token-part .big-txt-box {
+		height: 490px;
+	}
+    #pro-token-part .pro-token-item .pro-token-item-text {
+        width: 90%
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 20px;
+        padding-bottom: 10px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h5 {
+        font-size: 16px;
+        padding-bottom: 10px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        font-size: 13px;
+        padding-bottom: 0
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 18px;
+        padding-bottom: 10px
+    }
+    #latestnews-sub .latestnews-text .card-text h4 {
+        padding-bottom: 5px
+    }
+    #latestnews-sub .latestnews-text .card-text p {
+        line-height: 16px
+    }
+}
+
+@media (max-width:375px) {
+    .banner-manu-black {
+    padding: 10px 0px !important; }
+
+  .navbar-toggler {
+    padding: 3px 6px; }
+
+  .navbar-expand-lg .logo-main-top img {
+    max-height: 44px; }
+
+    .blockchain-left img {
+        max-width: 240px
+    }
+    .banner-header .all-header h2 {
+        font-size: 30px;
+        line-height: 30px
+    }
+    .blockchain-right-text h3 {
+        font-size: 14px
+    }
+    .club-header h3 {
+        font-size: 20px
+    }
+    .club-header h1 {
+        font-size: 20px
+    }
+    .club-header p {
+        font-size: 12px;
+        line-height: 22px
+    }
+    .video-wrapper {
+        height: 166px
+    }
+    .video-text h3 {
+        font-size: 20px
+    }
+    .video-text {
+        height: 260px
+    }
+    #biggest .biggest-box {
+        padding: 40px 0
+    }
+    #biggest .biggest-box .biggest-text img {
+        width: 170px
+    }
+    #biggest .biggest-box .biggest-text h4 {
+        padding: 20px 0;
+        font-size: 20px
+    }
+    #biggest .biggest-box p {
+        font-size: 16px;
+        padding: 0 5px 30px 5px
+    }
+    #biggest .biggest-box .biggest-text .btn {
+        font-size: 13px
+    }
+    #latestnews {
+        padding: 35px 0 60px 0
+    }
+    #latestnews .lastestnews-head h3 {
+        font-size: 21px;
+        padding: 30px 8px
+    }
+    #latestnews a i {
+        font-size: 22px
+    }
+    #contact .contact-box {
+        padding: 40px 20px
+    }
+    #contact .contact-box .contact-header h3 {
+        font-size: 23px;
+        padding-bottom: 25px
+    }
+    #membership .membership-box h5 {
+        margin-bottom: 25px;
+        font-size: 20px;
+        font-weight: 500
+    }
+    #membership .membership-box .btn {
+        font-size: 13px;
+        max-width: 275px;
+        padding: 12px 0
+    }
+    #teampart .teampart-box .teampart-img img {
+        margin: 28px 0 0 28px
+    }
+    #teampart .teampart-box:hover .teampart-img img {
+        margin: 28px 0 0 0
+    }
+    #contact .contact-box .contact-header p {
+        font-size: 14px
+    }
+    #touch .footer-box .subscribe .form-control {
+        width: 62%
+    }
+    .contact-height h4 {
+        font-size: 16px;
+        padding-top: 50px
+    }
+    .club-header-all h3 {
+        font-size: 24px;
+        padding-bottom: 25px
+    }
+    #social_media {
+        padding: 40px 0
+    }
+    #social_media .membership-club-wrapper {
+        padding: 25px 20px
+    }
+    #benefits {
+        padding: 40px 0
+    }
+    #benefits .benefits-wrapper {
+        padding: 25px 20px
+    }
+    #benefits .benefits-wrapper .benefits-box .benefits-icon i {
+        font-size: 25px;
+        padding-left: 5px
+    }
+    #benefits .benefits-wrapper .benefits-box .benefits-text h4 {
+        font-size: 18px;
+        padding-bottom: 8px
+    }
+    #benefits .benefits-wrapper .benefits-box .benefits-text p {
+        font-size: 13px
+    }
+    #timeline {
+        padding: 40px 0
+    }
+    #timeline .timeline-wrapper {
+        padding: 25px 15px
+    }
+    #timeline .timeline-pic {
+        height: 86px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 86px;
+        width: 86px
+    }
+    #club-gallery {
+        padding: 40px 0
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 47.8%
+    }
+    #cradit {
+        padding: 40px 0
+    }
+    #cradit .cradit-wrapper {
+        padding: 25px 20px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 80px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 95px
+    }
+    #club-ex-product .ex-product-main .ex-product-item .ex-product-item-box {
+        height: 190px
+    }
+    #pru-tokens-details .pru-tokens-details-box {
+        height: 260px
+    }
+    #pru-tokens-details .token-box-mobile {
+        height: 330px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 18px;
+        padding-bottom: 8px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h5 {
+        font-size: 16px;
+        padding-bottom: 5px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        font-size: 12px
+    }
+    #latestnews-sub .latestnews-text .product-text-sub {
+        width: 86%
+    }
+}
+
+@media (max-width:360px) {
+    .blockchain-right-text p {
+        font-size: 12px
+    }
+    .club-header h3 {
+        font-size: 18px
+    }
+    .club-header h1 {
+        font-size: 18px
+    }
+    .video-text h3 {
+        font-size: 18px
+    }
+    .img-overlay p {
+        padding: 10px 20px 0 20px
+    }
+    #video-main .arrow-video a {
+        font-size: 26px
+    }
+    .video-wrapper {
+        height: 160px
+    }
+    .video-text p {
+        font-size: 12px
+    }
+    .video-text {
+        height: 240px
+    }
+    #video-main {
+        padding: 30px 0 40px
+    }
+    #video-main .arrow-video {
+        bottom: 16px
+    }
+    .img-overlay p {
+        line-height: 16px
+    }
+    #latestnews .lastestnews-head h3 {
+        font-size: 18px
+    }
+    #contact .contact-box .contact-header h3 {
+        font-size: 22px;
+        padding-bottom: 25px
+    }
+    #membership .membership-box h5 {
+        margin-bottom: 25px;
+        font-size: 20px
+    }
+    #footer .footer-box .subscribe .form-control {
+        width: 62%;
+    }
+    #footer .footer-box .subscribe .footer-btn {
+        width: 36%;
+    }
+    #latestnews-sub .member-main {
+        height: 390px
+    }
+    #latestnews-sub .big-text {
+        height: 460px;
+    }
+    #philosophy .philosophy-box h3 {
+        font-size: 30px
+    }
+    #philosophy .philosophy-box h5 {
+        font-size: 16px
+    }
+    #joinour {
+        padding: 110px 0
+    }
+    #teampart .teampart-background {
+        padding: 30px 15px 60px
+    }
+    #teampart .teampart-header h3 {
+        font-size: 30px
+    }
+    #teampart .teampart-box {
+        margin: 50px auto 0
+    }
+    #teampart .teampart-box .teampart-img img {
+        margin: 26px 0 0 26px
+    }
+    #teampart .teampart-box:hover .teampart-img img {
+        margin: 26px 0 0 0
+    }
+    #touch .touch-header h3 {
+        font-size: 32px
+    }
+    #touch .touch-header h4 {
+        font-size: 16px
+    }
+    #touch .footer-box .subscribe .form-control {
+        width: 60%
+    }
+    .contact-height .btn {
+        font-size: 13px;
+        max-width: 150px
+    }
+    #timeline .timeline-pic {
+        height: 82px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 82px;
+        width: 82px
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 47.7%
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 90px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 90px
+    }
+	#pro-token-part .big-txt-box {
+		height: 570px;
+	}
+    #pro-token-part .pro-token-item .pro-token-item-text h3 {
+        font-size: 15px;
+        padding-bottom: 8px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text h5 {
+        font-size: 14px;
+        padding-bottom: 5px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text ul li p {
+        font-size: 12px
+    }
+    #pro-token-part .pro-token-item .pro-token-item-text p {
+        font-size: 14px
+    }
+    #pro-token-part .pro-token-item .list-last-text p {
+        font-size: 12px;
+        padding-top: 0
+    }
+    #pro-token-part .last-list-item {
+        height: 760px
+    }
+    #pru-tokens-details .token-box-mobile {
+        height: 380px
+    }
+}
+
+@media (max-width:320px) {
+    .video-wrapper {
+        height: 142px
+    }
+    #timeline .timeline-pic {
+        height: 71px
+    }
+    #timeline .timeline-pic .timeline-pic-box {
+        height: 71px;
+        width: 71px
+    }
+    #club-gallery .gallery-wrapper .gallery-width-50 {
+        width: 47.3%
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic {
+        max-width: 100%;
+        height: 77px
+    }
+    #club-ex-product .ex-product-slide .ex-product-pic img {
+        height: 100%;
+        max-width: 77px
+    }
+    
+    #footer .footer-box ul li a {
+    width: 38px;
+    height: 39px;
+    line-height: 39px; }
+
+  .modal-home-top .modal-dialog .modal-content .modal-body .company-main-box .company-img-box img {
+    max-width: 270px; } 
+}

@@ -1,0 +1,108 @@
+.modal-content {
+    position: relative;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    background-color: #0e0e0e3d;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.2);
+    border-radius: .3rem;
+    outline: 0;
+}
+.modal-content {
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 0px;
+    box-shadow: 0 0 15px 0px rgba(0, 0, 0, 0.2);
+}
+.modal-backdrop.show {
+  opacity: 0.75;
+}
+/** loader CSS **/
+.loader {
+  position: relative;
+  text-align: center;
+  margin: 15px auto 35px auto;
+  z-index: 9999;
+  display: block;
+  width: 80px;
+  height: 80px;
+  border: 8px solid rgba(0, 0, 0, 0.3);
+  border-radius: 50%;
+  border-top-color: #e2a236;
+  animation: spin 1s ease-in-out infinite;
+  -webkit-animation: spin 1s ease-in-out infinite;
+}
+@keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes spin {
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+.loader-txt {
+    color: #ffffff;
+}
+
+/*show password css*/
+input#pass {
+    position: relative;
+}
+
+input#password_confirmation {
+    position: relative;
+}
+
+i#view-pass {
+    position: absolute;
+    top: 22px;
+    transition: all 0.3s;
+    right: 20px;
+    cursor: pointer;
+}
+i#view-pass:hover {
+    opacity: 0.8;
+}
+.mystyle{
+    color: #e2a236;
+}
+.mystylez{
+    color: #e2a236;
+}
+i#view-pass-confirm {
+    position: absolute;
+    top: 22px;
+    transition: all 0.3s;
+    right: 20px;
+    cursor: pointer;
+}
+i#view-pass-confirm:hover {
+    opacity: 0.8;
+}
+
+/*email resend msg*/
+#resend_email_form .alert.alert-success {
+    margin-top: 30px;
+    color: #d19632;
+    background-color: #ffffff;
+}
+#resend_email_form .alert.alert-success button {
+    padding: 5px 15px;
+    border: 1px solid #e2a236;
+    margin: 0 10px;
+    background: transparent;
+    transition: all 0.3s;
+}
+#resend_email_form .alert.alert-success button:hover {
+    color: #fff;
+    background: #e2a236;
+}
