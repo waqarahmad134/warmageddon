@@ -1,0 +1,138 @@
+.content {
+    min-height: 80vh;
+}
+.flag {
+    width: 20px;
+    margin-bottom: 4px;
+    margin-right: 5px;
+}
+.sidebar-dropdown .sidebar-item.active .sidebar-link, .sidebar-dropdown .sidebar-link:hover {
+    background: #f5d730;
+}
+.cus_attr {
+    font-size: 20px;
+    font-weight: 500;
+}
+.breadcrumb-item.active {
+    color: black;
+}
+.input-tips {
+    margin-top: 5px;
+    margin-bottom: 2px;
+    color: #0361FF;
+}
+.input-tips span {
+    color: red;
+}
+.footer-right {
+    text-align: right;
+}
+.footer-left {
+    text-align: left;
+}
+.banned-games {
+    max-height: 350px;
+    overflow-y: scroll;
+}
+.banned-games li a {
+    text-decoration: none;
+    color: red;
+    font-weight: bold;
+}
+.banned-games li a span {
+    color: blue;
+    font-weight: bold;
+}
+
+/* Image upload section section Start*/
+.single-image {
+    padding: 10px;
+    background: #f1f1f1;
+    display: inline-block;
+    border-radius: 3px;
+    vertical-align: bottom;
+}
+
+.single-image > .image-holder {
+    cursor: default;
+    margin: 0;
+    border-radius: 3px;
+}
+
+.image-holder {
+    position: relative;
+    float: left;
+    height: 125px;
+    width: 125px;
+    overflow: hidden;
+    background: #fff;
+    margin: 0 10px 10px 0;
+    border: 1px solid #d2d6de;
+    border-radius: 3px;
+    cursor: move;
+    z-index: 0;
+}
+
+.cursor-auto {
+    cursor: auto !important;
+}
+
+.image-holder .icon-image {
+    font-size: 60px;
+    color: #d9d9d9;
+    z-index: -1;
+}
+
+.image-holder .icon-image, .image-holder > img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+/* Image upload section section End*/
+.hide {
+    display: none;
+}
+.payment-show td:nth-child(1) {
+    font-weight: bold;
+}
+
+
+/* Image preloader*/
+.loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite; /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.section-prograss {
+    position: fixed;
+    background: rgba(0, 0, 0, 0.6);
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 99999;
+    display: none;
+}
+.progress-section {
+    text-align: center;
+    margin-top: 6%;
+    padding: 4%;
+}
+/*preloader off*/

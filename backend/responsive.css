@@ -1,0 +1,14 @@
+@media (max-width: 768px) {
+    .card-body {
+        padding: 0px;
+    }
+    .footer-right {
+        text-align: center;
+    }
+    .footer-left {
+        text-align: center;
+    }
+    .breadcrumb {
+        font-size: 12px;
+    }
+}
