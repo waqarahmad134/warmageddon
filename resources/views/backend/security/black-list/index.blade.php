@@ -1,0 +1,150 @@
+@extends('backend.layouts.app')
+
+@section('title', 'Dashboard || Admin')
+
+@section('content')
+    <!-- Home Page Header Section Start -->
+    <div class="row">
+        <div class="col-12">
+            <div class="row ">
+                <div class="col-md-6 cus_attr">
+                    <p>Security</p>
+                </div>
+                <div class="col-md-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="#">Security</a></li>
+                            <li class="breadcrumb-item active">Blacklist</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Home Page Header Section End -->
+    <!-- <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>Block list</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="datatables-buttons" class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User name</th>
+                                <th>Email</th>
+                                <th>IP address</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($blacklist as $key => $item)
+                                <tr>
+                                    <td>{{ $key+1 }}</td>
+                                    <td>{{ $item->user_name }}</td>
+                                    <td>{{ $item->email }}</td>
+                                    <td>{{ $item->ip_address }}</td>
+                                    <td> 
+                                        @if ($item->status == 1)   
+                                            <button class="btn btn-success btn-sm">Active</button> 
+                                        @endif
+                                        @if ($item->status == 2)   
+                                            <button class="btn btn-danger btn-sm">Suspend</button> 
+                                        @endif
+                                   </td>
+                                    <td>
+                                            {{-- <a href="{{route('black-list.edit', $item->id)}}" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="top" title="View">Edit</a> --}}
+                                            <button onclick="deleUser({{ $item->id }},'{{$item->status == 1?'Block':'Unblock'}}')" class="btn btn-{{$item->status == 1?'danger':'success'}} btn-sm" data-toggle="tooltip" data-placement="top" title="{{ $item->status == 1?'Block this ':'Unblock this' }}">{{ $item->status == 1?'Block':'Unblock' }}</button>
+                                            <form id="delete-form-{{ $item->id }}" action="{{ route('black-list.block', $item->id) }}" method="POST" style="display: none;">
+                                                @csrf
+                                                @method('GET')
+                                            </form>
+                                        </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h3>Country Block list</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="datatables-buttons" class="table table-striped">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Country name</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($countries as $key => $country)
+                                <tr>
+                                    <td>{{ $key+1 }}</td>
+                                    <td>{{ $country->name }}</td>
+                                    <td> 
+                                        @if ($country->active_status == 1)   
+                                            <button class="btn btn-success btn-sm">Active</button> 
+                                        @endif
+                                        @if ($country->active_status == 0)   
+                                            <button class="btn btn-danger btn-sm">Suspend</button> 
+                                        @endif
+                                   </td>
+                                    <td>
+                                        <button onclick="deleUser({{ $country->id }},'{{$country->active_status == 1?'Block':'Unblock'}}')" class="btn btn-{{$country->active_status == 1?'danger':'success'}} btn-sm" data-toggle="tooltip" data-placement="top" title="{{ $country->active_status == 1?'Block this ':'Unblock this' }}">{{ $country->active_status == 1?'Block':'Unblock' }}</button>
+                                            <form id="delete-form-{{ $country->id }}" action="{{ route('black-list.block', $country->id) }}" method="POST" style="display: none;">
+                                                @csrf
+                                                @method('GET')
+                                            </form>
+                                        </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+@section('script')
+<script src="{{asset('backend/js/sweetaler2.js')}}"></script>
+
+    <script type="text/javascript">
+       
+        function deleUser(id,data) {
+				swal({
+                    title: 'Are you sure?',
+						type: 'warning',
+						showCancelButton: true,
+						confirmButtonColor: '#3085d6',
+						cancelButtonColor: '#d33',
+						confirmButtonText: data,
+						cancelButtonText: 'Cancel',
+						confirmButtonClass: 'btn btn-success ml-1',
+						cancelButtonClass: 'btn btn-danger mr-1',
+						buttonsStyling: false,
+						reverseButtons: true
+				}).then((result) =>{
+						if (result.value) {
+								event.preventDefault();
+								document.getElementById('delete-form-'+id).submit();
+						} 
+				})
+		}
+    </script>
+@endsection
