@@ -1,0 +1,114 @@
+
+$("select[id='Recurring_w']").change(function () {
+    var val = $("select[id='Recurring_w']").val();  
+    if (val == 'w' ) {
+        $("#_Day").removeClass("d-none"); 
+        $("#_Date").addClass("d-none");     
+    } else if(val == 'm'){
+        $("#_Date").removeClass("d-none");
+        $("#_Day").addClass("d-none");  
+
+        for(var i = 1 ; i<= 30 ; i++){
+            $("#_montly").append("<option value='"+i+"'>"+i+"</option>");
+        }
+    }
+});
+$("select[id='De_Recurring_w']").change(function () {
+    var val = $("select[id='De_Recurring_w']").val();  
+    if (val == 'w' ) {
+        $("#_de_Day").removeClass("d-none"); 
+        $("#_de_Date").addClass("d-none");
+    } else if(val == 'm'){
+        
+        $("#_de_Date").removeClass("d-none");
+        $("#_de_Day").addClass("d-none");  
+
+        for(var i = 1 ; i<= 30 ; i++){
+            $("#_Ddate").append("<option value='"+i+"'>"+i+"</option>");
+        }
+    }
+});
+
+$("select[id='bo_am_type']").change(function () {
+    var val = $("select[id='bo_am_type']").val();  
+    if (val == 'a' ) {
+        $("#_amount").removeClass("d-none"); 
+        $("#_percent_amount").addClass("d-none");     
+        $("#_max_amount").addClass("d-none");     
+    } else if(val == 'p'){
+        $("#_percent_amount").removeClass("d-none");
+        $("#_max_amount").removeClass("d-none");
+        $("#_amount").addClass("d-none");  
+
+    }
+});
+
+$(document).ready(function(){    
+    $('#multi_Game').select2({
+        allowClear: true,
+        minimumResultsForSearch: -1,
+        
+    });
+             
+    $("select").on("select2:select", function(evt) {
+        var element = evt.params.data.element;
+        var $element = $(element);
+        $element.detach();
+        $(this).append($element);
+        $(this).trigger("change");
+    });
+});
+$(document).ready(function(){    
+    $('#multi_User').select2({
+        allowClear: true,
+        minimumResultsForSearch: -1,
+        
+    });
+             
+    $("select").on("select2:select", function(evt) {
+        var element = evt.params.data.element;
+        var $element = $(element);
+        $element.detach();
+        $(this).append($element);
+        $(this).trigger("change");
+    });
+});
+$(document).ready(function(){    
+    $('#multi_country').select2({
+        allowClear: true,
+        minimumResultsForSearch: -1,
+        
+    });
+             
+    $("select").on("select2:select", function(evt) {
+        var element = evt.params.data.element;
+        var $element = $(element);
+        $element.detach();
+        $(this).append($element);
+        $(this).trigger("change");
+    });
+});
+$(document).ready(function(){    
+    $('#multi_Vip').select2({
+        allowClear: true,
+        minimumResultsForSearch: -1,
+        
+    });
+             
+    $("select").on("select2:select", function(evt) {
+        var element = evt.params.data.element;
+        var $element = $(element);
+        $element.detach();
+        $(this).append($element);
+        $(this).trigger("change");
+    });
+});
+$(document).ready(function(){     
+    for(var i = 1 ; i<= 30 ; i++){        
+        $("select[id='ex_chain']").append("<option value='"+i+"'>"+i+"</option>");
+    }
+})
+
+$("select[id='prize']").change(function () {    
+        $("#_amount").removeClass("d-none");
+});
