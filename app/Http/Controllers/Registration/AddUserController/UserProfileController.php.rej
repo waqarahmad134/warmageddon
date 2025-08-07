@@ -1,0 +1,10 @@
+diff a/app/Http/Controllers/Registration/AddUserController/UserProfileController.php b/app/Http/Controllers/Registration/AddUserController/UserProfileController.php	(rejected hunks)
+@@ -45,7 +45,7 @@
+     {
+ 
+         $requestData = $request->all();
+-         
++
+         UserProfile::create($requestData);
+ 
+         return redirect('user-profile')->with('flash_message', 'UserProfile added!');

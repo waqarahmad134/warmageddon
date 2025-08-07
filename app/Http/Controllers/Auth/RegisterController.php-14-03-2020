@@ -1,0 +1,314 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+use Auth;
+use Mail;
+use Session;
+use App\User;
+use App\Token;
+use App\ProsixUserWallet;
+use App\GameEarning;
+use Socialite;
+use App\Account;
+use Carbon\Carbon;
+use App\VerifyUser;
+use App\SocialLogin;
+use App\Notification;
+use App\PropersixBonus;
+use App\Mail\VerifyMail;
+use App\RegistrationBonus;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Brian2694\Toastr\Facades\Toastr;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\RegistersUsers;
+
+class RegisterController extends Controller
+{
+    /*
+    |--------------------------------------------------------------------------
+    | Register Controller
+    |--------------------------------------------------------------------------
+    |
+    | This controller handles the registration of new users as well as their
+    | validation and creation. By default this controller uses a trait to
+    | provide this functionality without requiring any additional code.
+    |
+    */
+
+    use RegistersUsers;
+
+    /**
+     * Where to redirect users after registration.
+     *
+     * @var string
+     */
+    protected $redirectTo = '/user/dashboard';
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('guest');
+    }
+
+    public function register(Request $request)
+    {
+       // dd($request->all());
+        $this->validator($request->all())->validate();
+        event(new Registered($user = $this->create($request->all())));
+        $this->guard()->login($user);
+
+        return $this->registered($request, $user)
+                        ?: redirect($this->redirectPath());
+    }
+
+    /**
+     * Get a validator for an incoming registration request.
+     *
+     * @param  array  $data
+     * @return \Illuminate\Contracts\Validation\Validator
+     */
+    protected function validator(array $data)
+    {
+        return Validator::make($data, [
+            'first_name' => ['required', 'string', 'max:255'],
+            'gender' => ['required', 'string', 'max:255'],
+            'country' => ['required'],
+            'zipcode' => ['required'],
+            'phoneField1' => ['required','min:8'],
+            'state' => ['required', 'string', 'max:255'],
+            'username' => ['required', 'string', 'max:255','unique:user_profiles'],
+            'address' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'dob' => ['required','before:-18 years'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ]);
+    }
+
+    /**
+     * Create a new user instance after a valid registration.
+     *
+     * @param  array  $data
+     * @return \App\User
+     */
+    protected function create(array $data)
+    {
+        $user=new User;
+        $user->user_name=$data['username'];
+        $user->email=$data['email'];
+        $user->dob=date('Y-m-d', strtotime($data['dob']));
+        $user->country=$data['country'];
+        $user->country_code=$data['phoneField1_phoneCode'];
+        $user->phone=Ltrim($data['phoneField1'],0);
+        $user->password=Hash::make($data['password']);
+        $user->ip_address= \Request::ip();
+        $user->save();
+        if (@Session::get('aff_id')) {
+            $listaffiliate=new \App\ListAffiliate;
+            $listaffiliate->user_id=$user->id;
+            $listaffiliate->name=$data['username'];
+            $listaffiliate->aff_id=Session::get('aff_id');
+            $listaffiliate->save();
+        }
+
+        $user_profile =new \App\UserProfile;
+        $user_profile->user_id = $user->id;
+        $user_profile->first_name=$data['first_name'];
+        $user_profile->last_name=$data['last_name'];
+        $user_profile->username=$data['username'];
+        $user_profile->gender=$data['gender'];
+        $user_profile->base_image='user/profile/avatar.png';
+        $user_profile->country = $data['country'];
+        $user_profile->state = $data['state'];
+        $user_profile->zipcode =$data['zipcode'];
+        $user_profile->phone_number =$data['phoneField1'];
+        $user_profile->address =$data['address'];
+        $user_profile->date_of_birth =date('Y-m-d', strtotime($data['dob']));
+        $user_profile->save();
+        $wallet = new ProsixUserWallet;
+        $wallet->user_id=$user->id;
+        $wallet->save();
+
+        $earning_game = new GameEarning;
+        $earning_game->user_id=$user->id;
+        $earning_game->save();
+
+        $account=new Account;
+        $account->user_id=$user->id;
+        $account->save();
+
+       /*  $bonus_am = PropersixBonus::where('type','registration')->where('status',1)->first();
+        if (isset($bonus_am)) {
+            if (@$bonus_am->ex_country) {
+                $da = PropersixBonus::where('type','registration')->where('ex_country','like', '%'.$data['country'].'%')->get();
+                if (!is_null($da)) {
+
+                    if (@$bonus_am->specific_day) {
+                        $data = PropersixBonus::where('type','registration')->where('specific_day','=',Carbon::today()->toDateString())->first();
+                        if (!is_null($data)) {
+                            $this->Bonus($user,$bonus_am);
+                        }
+                    }
+                    if (@$bonus_am->till) {
+                        $data = PropersixBonus::where('type','registration')
+                                            ->where('from', '<=', Carbon::today()->toDateString())
+                                            ->where('till', '>=', Carbon::today()->toDateString())
+                                            ->first();
+                        if ($data->count() > 0) {
+                            $this->Bonus($user,$bonus_am);
+                        }
+                    }
+                    if (@$bonus_am->recurring) {
+                        if (@$bonus_am->recurring == 'w') {
+                            if (@$bonus_am->w_2 == date("W"))  {
+                                $this->Bonus($user,$bonus_am);
+                            }
+                        }
+                        if (@$bonus_am->recurring == 'm') {
+                            if (@$bonus_am->w_2 == date("d"))  {
+                                $this->Bonus($user,$bonus_am);
+                            }
+                        }
+                    }
+                }
+            }
+
+        } */
+        //account
+        $role_r = Role::where('name', '=','User')->firstOrFail();
+        $user->assignRole($role_r);
+
+        $verifyUser = \App\VerifyUser::create([
+            'user_id' => $user->id,
+            'token' => str_random(40)
+        ]);
+
+       // Mail::to($user->email)->send(new VerifyMail($user));
+
+
+        Mail::send('mail.email_verify', [
+            'username'      => $user->user_name,
+            'verify_url'     => url('user/verify',$verifyUser->token),
+        ], function($message) use($data){
+            $message->subject('ProperSix email verification');
+            $message->to($data['email']);
+        });
+
+        return $user;
+    }
+    public function verifyUser($token)
+    {
+        $verifyUser = \App\VerifyUser::where('token', $token)->first();
+        if(isset($verifyUser) ){
+            $user = $verifyUser->user;
+            if(!$user->verified) {
+                $verifyUser->user->verified = 1;
+                $verifyUser->user->phone_verification = 1;
+                $verifyUser->user->save();
+                $status = "Your e-mail is verified. You can now log in.";
+            }else{
+                $status = "Your email is verified. You can now login.";
+            }
+        }else{
+            Toastr::success('Sorry your email cannot be identified','Success');
+            return redirect('/');
+        }
+        Toastr::success($status,'success');
+        return redirect('user-login')->with($status,'success');
+    }
+    protected function registered(Request $request, $user)
+    {
+        if (Auth::user()->verified == 0) {
+            auth()->logout();
+            return redirect()->route('user.emailVerify');
+
+            return redirect()->back()->with('status','You need to verify your account. We have sent you an activation code, please check your email.');
+            Toastr::Error('You need to verify your account. We have sent you an activation code, please check your email.','Error');
+            return redirect('user-login')/* ->with('error','You need to verify your account. We have sent you an activation code, please check your email.') */;
+        }
+       /*  if (Auth::user()->phone_verification == 0) {
+
+            $token = Token::create([
+                'user_id' => Auth::user()->id
+            ]);
+            if ($token->sendCode()) {
+                session()->put("token_id", $token->id);
+                session()->put("user_id",  Auth::user()->id);
+
+                return redirect()->route('user.sms_send_verification');
+            }
+            $token->delete();// delete token because it can't be sent
+            return redirect('user-login')->withErrors([
+                "Your number is not correct ! Please enter your right number "
+            ]);
+            //return redirect('verification');
+          } */
+        $this->guard()->logout();
+       // Toastr::success('We sent you an activation code. Check your email and click on the link to verify.','Success');
+        return redirect('/');
+
+       //return response()->json(['success'=>'success']);
+    }
+
+    public function redirectToProvider($provider)
+    {
+        return Socialite::driver($provider)->redirect();
+    }
+
+    function Bonus($user,$data){
+
+        $bonus=new \App\Bonus;
+        $bonus->user_id = $user->id;
+        $bonus->amount= $data->bonus_amount;
+        $bonus->spin = @$data->free_spin;
+        $bonus->betsize = @$data->bet_size;
+        $bonus->line = @$data->lines;
+        $bonus->type='registration_bonus';
+        $bonus->from='casino';
+        $bonus->to=$user->user_name;
+        $bonus->save();
+        logCreatedActivity($data,$bonus->type,$bonus);
+        // notification
+        $notification=new \App\Notification;
+        $notification->user_id=$user->id;
+        $notification->message='You got '.$data->bonus_amount.' token and '.$data->free_spin.' spin bonus for registration';
+        $notification->save();
+
+        $account=Account::find($user->account->id);
+        $account->total= $data->bonus_amount;
+        $account->total_spin= $data->free_spin;
+        $account->save();
+
+        $wal = ProsixWalletType::where('type',$bonus->type)->first();
+        if (is_null($wal)) {
+            $wallet_type= new ProsixWalletType();
+        } else {
+            $wallet_type = $wal;
+        }
+        $wallet_type->type=$bonus->type;
+        $wallet_type->save();
+        $wallet =new ProsixWallet();
+        $wallet->user_id = Auth::user()->id;
+        $wallet->amount =$data->bonus_amount;
+        $wallet->type_id =  $wallet_type->id;
+        $wallet->created_by=Auth::id();
+        $wallet->save();
+
+        $account=ProsixUserWallet::updateOrCreate(['user_id'=>$user->id]);
+        $account->free_token= @$data->bonus_amount;
+        $account->free_spin= @$data->free_spin;
+        $account->type_id= $wallet_type->id;
+        $account->save();
+
+
+    }
+
+}

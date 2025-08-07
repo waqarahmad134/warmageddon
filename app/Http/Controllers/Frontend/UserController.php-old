@@ -1,0 +1,667 @@
+<?php
+
+namespace App\Http\Controllers\Frontend;
+use Auth;
+use File;
+use Image;
+use App\User;
+use App\Bonus;
+use App\Wager;
+use App\Account;
+use App\AddGame;
+use App\AddShop;
+use App\Balance;
+use App\Helpline;
+use App\Loyality;
+use Carbon\Carbon;
+use App\GameEarning;
+use App\UserMission;
+use App\FavoriteGame;
+use App\MissionBonus;
+use App\Notification;
+use App\ProsixWallet;
+use App\PurchasesShop;
+use App\TokenCurrency;
+use App\UserDocuments;
+use App\PropersixBonus;
+use App\TransactionType;
+use App\ProsixUserWallet;
+use App\ProsixWalletType;
+use App\ProsixTransaction;
+use App\Account_deactivate;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Brian2694\Toastr\Facades\Toastr;
+use Illuminate\Support\Facades\Hash;
+
+class UserController extends Controller
+{
+    function dashboard(){
+        return $this->all_data();
+    }
+    function aff_list(){
+        return view('frontend.casino_user.aff-list');
+    }
+    function aff_nickname(){
+        return view('frontend.casino_user.aff-nickname');
+    }
+
+    function acc_data(){
+        return view('frontend.casino_user.acc-data');
+    }
+    function acc_bank(){
+        return view('frontend.casino_user.acc-bank');
+    }
+
+    function acc_document(Request $r){
+        $r->validate([
+            'document_type' => 'required|unique:user_documents,type',
+            'file' => 'required|mimes:jpeg,png,jpg,doc,pdf,docx,zip',
+        ]);
+        try {
+            $data = new UserDocuments();
+            $data->user_id = Auth::user()->id;
+            $data->type = $r->document_type;
+            $data->save();
+            if($r->hasFile('file')){
+                $file = $r->file('file');
+                $pathImage = 'public/uploads/document/';
+                if (!file_exists($pathImage)){
+                    mkdir($pathImage, 0777, true);
+                    $fileName = time().'.'.$r->file->extension();
+                    $r->file->move('public/uploads/document/', $fileName);
+                    $data->file =  'public/uploads/document/'.$fileName;
+                }else{
+                    $fileName = time().'.'.$r->file->extension();
+                    $r->file->move('public/uploads/document/', $fileName);
+                    $data->file =  'public/uploads/document/'.$fileName;
+                }
+                $data->save();
+            }
+            Toastr::success('Document upload Successfully!)','Success');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again. ','Error');
+            return redirect()->back();
+        }
+    }
+    function user_profile(){
+        return $this->all_data();
+    }
+
+    function all_data(){
+        try {
+           $missions = MissionBonus::latest()->get();
+           $user=User::find(Auth::user()->id);
+        return view('frontend.casino_user.dashboard',compact('user','missions'));
+
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again. ','Error');
+            return redirect()->back();
+        }
+    }
+    public function update(Request $r,$id){
+       // dd($r->all());
+        $r->validate([
+            'first_name' => 'sometimes|nullable|string|max:255',
+            'last_name' => 'sometimes|nullable|string|max:255',
+            'zipcode' => 'sometimes|nullable|required',
+            'Language' => 'sometimes|nullable|string|max:255',
+            'state' => 'sometimes|nullable|string|max:255',
+            'country' => 'sometimes|nullable|string|max:255',
+            'Address' => 'sometimes|nullable|string|max:255',
+            'phone' => 'sometimes|nullable',
+            'dob' => 'sometimes|nullable|before:-18 years',
+        ]);
+        try{
+            $user_pr=User::findOrFail($id);
+            $user_pr->phone = $r->phone;
+            $user_pr->country_code = $r->phone_phoneCode;
+            $user_pr->save();
+
+            $user=$user_pr->profile;
+            $user->first_name = $r->first_name;
+            $user->last_name = $r->last_name;
+            $user->country = $r->country;
+            $user->state = $r->state;
+            $user->zipcode = $r->zipcode;
+            $user->phone_number = $r->phone;
+            $user->address = $r->Address;
+            $user->date_of_birth = date('Y-m-d', strtotime($r->dob));
+            $user->gender = $r->gender;
+            $user->language = $r->Language;
+
+            if($r->hasFile('image')){
+                $file = $r->file('image');
+                $images = Image::canvas(300, 300, '#fff');
+                $image  = Image::make($file)->resize(300, 300, function($constraint){
+                    $constraint->aspectRatio();
+                });
+                $images->insert($image, 'center');
+                $pathImage = 'user/profile/';
+                if (!file_exists($pathImage)){
+                    mkdir($pathImage, 0777, true);
+                    $name =time() .'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                    $images->save('user/profile/'.$name);
+                    $user->base_image =  $name;
+                }else{
+                    $name =time() .'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                    if ($user->base_image) {
+                        if ($user->base_image != 'user/profile/avatar.png') {
+                            File::delete('user/profile/'.$user->base_image);
+                        }
+                    }
+                    $images->save('user/profile/'.$name);
+                    $user->base_image =  'user/profile/'.$name;
+                }
+                $user->save();
+
+                    }
+
+            $user->save();
+            Toastr::success('Profile Update Successfully!)','Success');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again. ','Error');
+            return redirect()->back();
+        }
+   }
+    public function Security(Request $r,$id){
+     //   dd($r->all());
+        $r->validate([
+            'secret_answer' => 'required|string|max:255',
+            'secret_question' => 'required|string|max:255',
+            'password' => 'required|min:8|max:20',
+        ]);
+        try {
+            if(!\Hash::check($r->password, auth()->user()->password)){
+                Toastr::error('The password is incorrect.');
+                return redirect()->back();
+           }else{
+
+            $user_pr=User::findOrFail($id);
+
+            $user=$user_pr->profile;
+            $user->secret_question = $r->secret_question;
+            $user->secret_answer = $r->secret_answer;
+            $user->save();
+            Toastr::success('Security Update Successfully!','Success');
+            return redirect()->back();
+        }
+
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again.','Error');
+            return redirect()->back();
+        }
+   }
+    public function PasswordChange(Request $r,$id){
+        $r->validate([
+            'old_password' => 'required|min:8|max:20',
+            'password' => 'required|min:8|max:20:confirmed',
+        ]);
+        try {
+            if(!\Hash::check($r->old_password, auth()->user()->password)){
+                Toastr::error('The password is incorrect.');
+                return redirect()->back();
+           }else{
+
+            $user=User::findOrFail($id);
+
+            $user->password = Hash::make($r->password);
+            $user->save();
+            Toastr::success('Password Update Successfully!','Success');
+            return redirect()->back();
+        }
+
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again. ','Error');
+            return redirect()->back();
+        }
+   }
+    function currency_convert($amount){
+        try {
+            $data =TokenCurrency::where(['status'=>1,'doller'=>1])->first();
+            $result =$data->pley6_token * floatval($amount);
+            return response()->json($result, 200);
+        } catch (\Exception $e) {
+            return response()->json('data not found', 400);
+        }
+    }
+
+   function Proupdate(Request $r){
+             $user=Auth::user()->profile;
+            if($r->hasFile('image')){
+                $file = $r->file('image');
+                $images = Image::canvas(300, 300, '#fff');
+                $image  = Image::make($file)->resize(300, 300, function($constraint){
+                    $constraint->aspectRatio();
+                });
+                $images->insert($image, 'center');
+                $pathImage = 'user/profile/';
+                if (!file_exists($pathImage)){
+                    mkdir($pathImage, 0777, true);
+                    $name =time() .'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                    $images->save('user/profile/'.$name);
+                    $user->base_image =  $name;
+                }else{
+                    $name =time() .'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                    if ($user->base_image) {
+                        if ($user->base_image != 'user/profile/avatar.png') {
+                            File::delete('user/profile/'.$user->base_image);
+                        }
+                    }
+                    $images->save('user/profile/'.$name);
+                    $user->base_image =  'user/profile/'.$name;
+                }
+                $user->save();
+
+            }
+            return response()->json(['success'=>'done', 200]);
+
+   }
+    public function InboxDelete($ids,$type){
+        try {
+            if ($ids != []) {
+                    foreach (json_decode($ids) as $key => $value) {
+                        $data = Notification::findOrFail($value);
+                        $data->delete();
+                    }
+                     $dat = DB::table('notifications')->where('user_id',Auth::user()->id)->where('status',0)->count();
+                   return response()->json(['success'=>'success','item'=> $dat], 200);
+                }else {
+                    return response()->json(['error'=>'Inbox not delete'], 200);
+                }
+            } catch (\Exception $e) {
+                //return response()->json($e, 200);
+                return response()->json(['error'=>'Something went wrong! try again'], 200);
+            }
+
+    }
+    public function account_deactivate(Request $request){
+        $data=User::find($request->id);
+        if ($request->question == Auth::user()->ans && Hash::check($request->password, $data->password)) {
+           $data=new Account_deactivate;
+           $data->user_id=$request->id;
+           $data->time=$request->time;
+           $data->reason=$request->reason;
+           $data->save();
+           Toastr::success('Thank you for submit','Success');
+           return response()->json(['data' => json_encode($request->all())], 200);
+        }
+        else {
+            return response()->json('Please enter correct value', 400);
+        }
+    }
+    public function support(Request $request){
+           $data=new Helpline;
+           $data->user_id=$request->id;
+           $data->email=$request->email;
+           $data->message=$request->message;
+           $data->priority=$request->priority;
+           $data->save();
+           Toastr::success('Thank you for submit','Success');
+           return response()->json(['data' => json_encode($request->all())], 200);
+
+    }
+    public function InboxSee($id){
+
+           $not_view=\App\Notification::findOrFail($id);
+            $not_view->status=1;
+            $not_view->save();
+            $dat = DB::table('notifications')->where('user_id',Auth::user()->id)->where('status',0)->count();
+            return response()->json(['success'=>'success','item'=> $dat], 200);
+    }
+    public function notification_id(Request $request,$id){
+
+           $not_view=\App\Notification::findOrFail($id);
+            $not_view->status=1;
+            $not_view->save();
+           return response()->json($not_view,200);
+    }
+
+    function balnceUpdate(){
+        if (Auth::check()) {
+           $balance = Auth::user()->account->total;
+           return response()->json($balance, 200);
+        }else {
+            $balance = 0;
+            return response()->json($balance, 200);
+        }
+    }
+    function UserPrevent(){
+        if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+            $user->game_status = 0;
+            $user->save();
+           return response()->json($user, 200);
+        }
+    }
+    function favorite_game($id){
+         if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+            if (@$user->favorite_game->count() > 0) {
+                @$game = FavoriteGame::where('user_id',$user->id)->where('game_id',$id)->first();
+                if (!@$game) {
+                    $fav = new FavoriteGame();
+                    $fav->user_id = $user->id;
+                    $fav->game_id = $id;
+                    $fav->save();
+                   return response()->json(['success'=>'success'], 200);
+                }
+                @$game->delete();
+                return response()->json(['delete'=>'success'], 200);
+            }
+            $fav = new FavoriteGame();
+            $fav->user_id = $user->id;
+            $fav->game_id = $id;
+            $fav->save();
+           return response()->json(['success'=>'success'], 200);
+        }else {
+            return response()->json(['error'=>'something went wrong'], 200);
+        }
+    }
+    function Get_favorite_game(){
+        if (Auth::check()) {
+            $user = User::findOrFail(Auth::user()->id);
+            if (@$user->favorite_game->count() > 0) {
+                return response()->json(@$user->favorite_game, 200);
+            }
+           return response()->json(['notFound'=>'not found'], 200);
+        }else {
+            return response()->json(['error'=>'something went wrong'], 200);
+        }
+    }
+    function Apply_Bonus($bonus_code){
+
+            $bonus = PropersixBonus::where('type','code')->where('bonus_code',$bonus_code)->where('status',1)->first();
+            DB::beginTransaction();
+            if (!is_null($bonus)) {
+                if (@$bonus->users) {
+                    if (@UserCheck($bonus_code) <= 0) {
+                        return response()->json(['error'=>'You are not eligible for a bonus.'], 200);
+                    }
+                }
+               /*  if (@$bonus->ex_country) { */
+                    $data = PropersixBonus::where('type','code')->where('bonus_code',$bonus_code)->where('ex_country','like', '%'.Auth::user()->profile->country.'%')->get();
+                    if (@$data->count() > 0) {
+                        return response()->json(['error'=>'Your country is not eligible for bonus'], 200);
+                    }else {
+                        $b_c = Bonus::where('add_bonus_id',@$bonus->id)->first();
+                        if (@$b_c) {
+                            return response()->json(['error'=>'Bonus already added'], 200);
+                        }
+                        if (@$bonus->specific_day) {
+                            $data = PropersixBonus::where('type','code')->where('bonus_code',$bonus_code)->where('specific_day','=',Carbon::today()->toDateString())->first();
+                            if (@$data->count() > 0) {
+
+                                $bonus=new \App\Bonus;
+                                $bonus->user_id =Auth::id();
+                                $bonus->amount= $data->bonus_amount;
+                                $bonus->spin = @$data->free_spin;
+                                $bonus->betsize = @$data->bet_size;
+                                $bonus->line = @$data->lines;
+                                $bonus->type = $data->type;
+                                $bonus->from='casino';
+                                $bonus->to= Auth::user()->user_name;
+                                $bonus->save();
+
+                                // notification
+                                $notification=new \App\Notification;
+                                $notification->user_id=Auth::id();
+                                $notification->message='You got '.$data->bonus_amount.' token and '.$data->free_spin.' spin bonus';
+                                $notification->save();
+
+                                $account=Account::where('user_id',Auth::id())->first();
+                                $account->total= $data->bonus_amount;
+                                $account->total_spin= $data->free_spin;
+                                $account->save();
+
+                                $wal = ProsixWalletType::where('type',$bonus->type)->first();
+                                if (is_null($wal)) {
+                                    $wallet_type= new ProsixWalletType();
+                                } else {
+                                    $wallet_type = $wal;
+                                }
+                                $wallet_type->type=$bonus->type;
+                                $wallet_type->save();
+
+                                $wallet =new ProsixWallet();
+                                $wallet->user_id = Auth::user()->id;
+                                $wallet->amount = $data->bonus_amount;
+                                $wallet->type_id =  $wallet_type->id;
+                                $wallet->created_by=Auth::id();
+                                $wallet->save();
+
+                                $userWallet=ProsixUserWallet::updateOrCreate(['user_id'=>Auth::id()]);
+                                $userWallet->free_token= $userWallet->free_token + floatval(@$data->bonus_amount);
+                                $userWallet->free_spin= $userWallet->free_spin + floatval(@$data->free_spin);
+                                $userWallet->type_id=$wallet_type->id;
+                                $userWallet->save();
+
+                                $user_id  = Auth::id();
+                                $logModel = $bonus;
+                                $request = $bonus;
+                                $log =  $bonus->type;
+                                logCreatedActivity($user_id,$logModel,$request,$log);
+
+                                DB::commit();
+
+                                return response()->json(['success'=>'success'], 200);
+                            }else {
+                                return response()->json(['error'=>'Bonus code expired'], 200);
+                            }
+                        }
+                        elseif (@$bonus->till) {
+                            $data = PropersixBonus::where('type','code')
+                                                  ->where('bonus_code',$bonus_code)
+                                                  ->where('from', '<=', Carbon::today()->toDateString())
+                                                  ->where('till', '>=', Carbon::today()->toDateString())
+                                                  ->first();
+                            if ($data->count() > 0) {
+                                // s
+                                $bonus=new \App\Bonus;
+                                $bonus->user_id =Auth::id();
+                                $bonus->amount= $data->bonus_amount;
+                                $bonus->spin = @$data->free_spin;
+                                $bonus->betsize = @$data->bet_size;
+                                $bonus->line = @$data->lines;
+                                $bonus->type = $data->type;
+                                $bonus->from='casino';
+                                $bonus->to= Auth::user()->user_name;
+                                $bonus->save();
+
+                                // notification
+                                $notification=new \App\Notification;
+                                $notification->user_id=Auth::id();
+                                $notification->message='You got '.$data->bonus_amount.' token and '.$data->free_spin.' spin bonus';
+                                $notification->save();
+
+                                $account=Account::where('user_id',Auth::id())->first();
+                                $account->total= $data->bonus_amount;
+                                $account->total_spin= $data->free_spin;
+                                $account->save();
+
+                                $wal = ProsixWalletType::where('type',$bonus->type)->first();
+                                if (is_null($wal)) {
+                                    $wallet_type= new ProsixWalletType();
+                                } else {
+                                    $wallet_type = $wal;
+                                }
+                                $wallet_type->type=$bonus->type;
+                                $wallet_type->save();
+
+                                $wallet =new ProsixWallet();
+                                $wallet->user_id = Auth::user()->id;
+                                $wallet->amount = $data->bonus_amount;
+                                $wallet->type_id =  $wallet_type->id;
+                                $wallet->created_by=Auth::id();
+                                $wallet->save();
+
+                                $userWallet=ProsixUserWallet::updateOrCreate(['user_id'=>Auth::id()]);
+                                $userWallet->free_token= $userWallet->free_token + floatval(@$data->bonus_amount);
+                                $userWallet->free_spin= $userWallet->free_spin + floatval(@$data->free_spin);
+                                $userWallet->type_id=$wallet_type->id;
+                                $userWallet->save();
+
+                                $user_id  = Auth::id();
+                                $logModel = $bonus;
+                                $request = $bonus;
+                                $log =  $bonus->type;
+                                logCreatedActivity($user_id,$logModel,$request,$log);
+
+                                DB::commit();
+                                return response()->json(['success'=>'success'], 200);
+                            }else {
+                                return response()->json(['error'=>'Bonus code expired'], 200);
+                            }
+
+                        }
+                    }
+
+               /*  } else {
+
+                    return response()->json(['error'=>'You are not eligible for a bonus.'], 200);
+                } */
+
+            }else {
+                return response()->json(['error'=>'Invalid bonus code'], 200);
+            }
+    }
+    public function MissionStart(Request $res){
+        try {
+            $data = MissionBonus::find($res->id);
+            $amount = DB::table('game_earnings')->where('user_id',Auth::user()->id)->sum('token');
+            if (@$amount >= $data->amount || $data->id == 1) {
+            if (is_null($data)) {
+                return response()->json(['error'=>'Not found!'], 200);
+            }else {
+                $complt = UserMission::where(['mission_id'=>$res->id,'user_id'=>Auth::user()->id,'status'=>0])->first();
+                if (!is_null($complt)) {
+                    return response()->json(['error'=>'Already completed mission!'], 200);
+                }
+                $d = UserMission::where(['mission_id'=>$res->id,'user_id'=>Auth::user()->id,'status'=>1])->first();
+                if (!is_null($d)) {
+                    return response()->json(['error'=>'Already Started mission!'], 200);
+                }else {
+                    $change = UserMission::where(['user_id'=>Auth::user()->id,'status'=>1])->get();
+                    if (@$change) {
+                       foreach ($change as $key => $value) {
+                          $value->status = 0;
+                          $value->save();
+                       }
+                    }
+                    $mission = new UserMission();
+                    $mission->mission_id = $res->id;
+                    $mission->user_id = Auth::user()->id;
+                    $mission->save();
+                    return response()->json(['success'=>'success'], 200);
+                }
+             }
+            }
+            else{
+                return response()->json(['error'=>'Insufficient wager amount'], 200);
+            }
+            } catch (\Exception $e) {
+                return response()->json(['error'=>'Something went wrong! try again'], 200);
+            }
+    }
+    public function ShopStart(Request $res){
+        DB::beginTransaction();
+        try {
+            $tok = TokenCurrency::where(['status'=>1,'doller'=>1])->first();
+            $amount = Account::where('user_id',Auth::user()->id)->sum('balance');
+           // $amount =$tok->pley6_token * floatval($system_token);
+
+            $data = AddShop::find($res->id);
+            if($data->price > $amount){
+                return response()->json(['error'=>'Your balance is insuffient'], 200);
+            }
+            if (is_null($data)) {
+                return response()->json(['error'=>'Not found!'], 200);
+            }else {
+                    $mission = new \App\PurchasesShop();
+                    $mission->shop_id = $res->id;
+                    $mission->user_id = Auth::user()->id;
+                    $mission->save();
+                    $acc= Account::where('user_id',Auth::id())->first();
+                    $acc->balance=$acc->balance - floatval(@$data->price);
+                    $acc->save();
+                    $bonus_type = 'shop_token';
+                    $bonus_from = 'casino';
+                    Wallet($data->amount,$bonus_type,$bonus_from,Auth::id());
+
+                    /* $admin_token = Account::where('user_id',1)->first();
+                    $admin_token->total = $admin_token->total + $Mtoken;
+                    $admin_token->save(); */
+                    logCreatedActivity($data,$bonus_type,$data);
+
+                    DB::commit();
+                    return response()->json(['success'=>'success'], 200);
+             }
+            } catch (\Exception $e) {
+                return response()->json(['error'=>'Something went wrong! try again'], 200);
+            }
+    }
+
+    function BuyToken($amount){
+        $amount = intval($amount);
+        if (!is_int($amount)) {
+            return response()->json(['input_error'=>'Please insert valid number'], 200);
+        }
+        if ($amount <= 0) {
+            return response()->json(['input_error'=>'Please insert valid number'], 200);
+        }
+        DB::beginTransaction();
+       try {
+        $acc = ProsixUserWallet::where('user_id',Auth::id())->first();
+        if (@$acc->usd < @$amount) {
+            return response()->json(['error'=>'Your balance is insuffient'], 200);
+        }
+
+        $token_currency = TokenCurrency::where(['status'=>1,'doller'=>1])->first();
+        $token = $amount * $token_currency->pley6_token;
+
+        $type='buy_token';
+
+        $wal = ProsixWalletType::where('type',$type)->first();
+        if (is_null($wal)) {
+            $wallet_type= new ProsixWalletType();
+        } else {
+            $wallet_type = $wal;
+        }
+        $wallet_type->type=$type;
+        $wallet_type->save();
+
+        $wallet =new ProsixWallet();
+        $wallet->user_id = Auth::user()->id;
+        $wallet->amount = $token;
+        $wallet->type_id =  $wallet_type->id;
+        $wallet->created_by=Auth::id();
+        $wallet->save();
+
+        $userWallet=ProsixUserWallet::where('user_id',Auth::id())->first();
+        $userWallet->token= $userWallet->token +  $token;
+        $userWallet->usd= $userWallet->usd - floatval($amount);
+        $userWallet->type_id=$wallet_type->id;
+        $userWallet->save();
+
+        $AdminWallet=ProsixUserWallet::where('user_id',1)->first();
+        $AdminWallet->token= $AdminWallet->token +  $token;
+        $AdminWallet->type_id=$wallet_type->id;
+        $AdminWallet->save();
+        $user_id  = Auth::id();
+        $logModel = $userWallet;
+        $request = $userWallet;
+        $log =  $type;
+        logCreatedActivity($user_id,$logModel,$request,$log);
+        DB::commit();
+        return response()->json(['success'=>$token], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error'=>$e], 200);
+        }
+
+    }
+
+
+}

@@ -1,0 +1,299 @@
+<?php
+
+namespace App\Http\Controllers\Frontend;
+use Auth;
+use File;
+use Image;
+use App\User;
+use App\Wager;
+use App\Helpline;
+use App\TokenCurrency;
+use App\Account_deactivate;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Brian2694\Toastr\Facades\Toastr;
+use Illuminate\Support\Facades\Hash;
+
+class UserController extends Controller
+{
+    function dashboard(){
+        return $this->all_data();
+    }
+    function aff_list(){
+        return view('frontend.casino_user.aff-list');
+    }
+    function aff_nickname(){
+        return view('frontend.casino_user.aff-nickname');
+    }
+    function aff_invite(){
+        return view('frontend.casino_user.aff-invite');
+    }
+    function transac_his(){
+        return view('frontend.casino_user.transac-his');
+    }
+    function withdraw(){
+        return view('frontend.casino_user.withdraw');
+    }
+    function deposite(){
+        return view('frontend.casino_user.deposite');
+    }
+    function deposite_limit(){
+        return view('frontend.casino_user.deposite-limit');
+    }
+    function acc_statement(){
+        return view('frontend.casino_user.acc-statement');
+    }
+    function payment(){
+        return view('frontend.casino_user.payment');
+    }
+    function bouns(){
+        return view('frontend.casino_user.bouns');
+    }
+    function gameplay_his(){
+        return view('frontend.casino_user.gameplay-his');
+    }
+    function acc_data(){
+        return view('frontend.casino_user.acc-data');
+    }
+    function acc_bank(){
+        return view('frontend.casino_user.acc-bank');
+    }
+    function acc_document(){
+        return view('frontend.casino_user.acc-document');
+    }
+    function user_profile(){
+        return $this->all_data();
+    }
+
+    function all_data(){
+        try {
+           $user=User::find(Auth::user()->id);
+        return view('frontend.casino_user.dashboard',compact('user'));
+
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again. ','Error');
+            return redirect()->back();
+        }
+    }
+    public function update(Request $r,$id){
+       // dd($r->all());
+        $r->validate([
+            'first_name' => 'sometimes|nullable|string|max:255',
+            'last_name' => 'sometimes|nullable|string|max:255',
+            'zipcode' => 'sometimes|nullable|required',
+            'Language' => 'sometimes|nullable|string|max:255',
+            'state' => 'sometimes|nullable|string|max:255',
+            'country' => 'sometimes|nullable|string|max:255',
+            'Address' => 'sometimes|nullable|string|max:255',
+            'phone' => 'sometimes|nullable|min:10',
+            'dob' => 'sometimes|nullable|before:-18 years',
+        ]);
+        try{
+            $user_pr=User::findOrFail($id);
+            $user_pr->phone = $r->phone;
+            $user_pr->save();
+
+            $user=$user_pr->profile;
+            $user->first_name = $r->first_name;
+            $user->last_name = $r->last_name;
+            $user->country = $r->country;
+            $user->state = $r->state;
+            $user->zipcode = $r->zipcode;
+            $user->phone_number = $r->phone;
+            $user->address = $r->Address;
+            $user->date_of_birth = date('Y-m-d', strtotime($r->dob));
+            $user->gender = $r->gender;
+            $user->language = $r->Language;
+
+            if($r->hasFile('image')){
+                $file = $r->file('image');
+                $images = Image::canvas(300, 300, '#fff');
+                $image  = Image::make($file)->resize(300, 300, function($constraint){
+                    $constraint->aspectRatio();
+                });
+                $images->insert($image, 'center');
+                $pathImage = 'user/profile/';
+                if (!file_exists($pathImage)){
+                    mkdir($pathImage, 0777, true);
+                    $name =time() .'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                    $images->save('user/profile/'.$name);
+                    $user->base_image =  $name;
+                }else{
+                    $name =time() .'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                    if ($user->base_image) {
+                        if ($user->base_image != 'user/profile/avatar.png') {
+                            File::delete('user/profile/'.$user->base_image);
+                        }
+                    }
+                    $images->save('user/profile/'.$name);
+                    $user->base_image =  'user/profile/'.$name;
+                }
+                $user->save();
+
+                    }
+
+            $user->save();
+            Toastr::success('Profile Update Successfully!)','Success');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again. ','Error');
+            return redirect()->back();
+        }
+   }
+    public function Security(Request $r,$id){
+     //   dd($r->all());
+        $r->validate([
+            'secret_answer' => 'required|string|max:255',
+            'secret_question' => 'required|string|max:255',
+            'password' => 'required|min:8|max:20',
+        ]);
+        try {
+            if(!\Hash::check($r->password, auth()->user()->password)){
+                Toastr::error('The password is incorrect.');
+                return redirect()->back();
+           }else{
+
+            $user_pr=User::findOrFail($id);
+
+            $user=$user_pr->profile;
+            $user->secret_question = $r->secret_question;
+            $user->secret_answer = $r->secret_answer;
+            $user->save();
+            Toastr::success('Security Update Successfully!','Success');
+            return redirect()->back();
+        }
+
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again. ','Error');
+            return redirect()->back();
+        }
+   }
+    public function PasswordChange(Request $r,$id){
+        $r->validate([
+            'old_password' => 'required|min:8|max:20',
+            'password' => 'required|min:8|max:20:confirmed',
+        ]);
+        try {
+            if(!\Hash::check($r->old_password, auth()->user()->password)){
+                Toastr::error('The password is incorrect.');
+                return redirect()->back();
+           }else{
+
+            $user=User::findOrFail($id);
+
+            $user->password = Hash::make($r->password);
+            $user->save();
+            Toastr::success('Password Update Successfully!','Success');
+            return redirect()->back();
+        }
+
+        } catch (\Exception $e) {
+            Toastr::error('Something went wrong. Please try again. ','Error');
+            return redirect()->back();
+        }
+   }
+    function currency_convert($amount){
+        try {
+            $data = TokenCurrency::where(['status'=>1,'doller'=>1])->first();
+            $result =$data->pley6_token * floatval($amount);
+            return response()->json($result, 200);
+        } catch (\Exception $e) {
+            return response()->json('data not found', 400);
+        }
+    }
+
+   function Proupdate(Request $r){
+             $user=Auth::user()->profile;
+            if($r->hasFile('image')){
+                $file = $r->file('image');
+                $images = Image::canvas(300, 300, '#fff');
+                $image  = Image::make($file)->resize(300, 300, function($constraint){
+                    $constraint->aspectRatio();
+                });
+                $images->insert($image, 'center');
+                $pathImage = 'user/profile/';
+                if (!file_exists($pathImage)){
+                    mkdir($pathImage, 0777, true);
+                    $name =time() .'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                    $images->save('user/profile/'.$name);
+                    $user->base_image =  $name;
+                }else{
+                    $name =time() .'-'.uniqid().'.'.$file->getClientOriginalExtension();
+                    if ($user->base_image) {
+                        if ($user->base_image != 'user/profile/avatar.png') {
+                            File::delete('user/profile/'.$user->base_image);
+                        }
+                    }
+                    $images->save('user/profile/'.$name);
+                    $user->base_image =  'user/profile/'.$name;
+                }
+                $user->save();
+
+            }
+            return response()->json(['success'=>'done', 200]);
+
+   }
+    public function wager_limit(Request $request){
+        $user=User::find($request->id);
+        if (Hash::check($request->password, $user->password)) {
+        $data=Wager::firstOrCreate(['user_id' => $request->id]);
+        $data->wager_limit=$request->wager;
+        $data->los_limit=$request->loss;
+        $data->deposit_limit=$request->deposit;
+        $data->session_limit=$request->session;
+        $data->user_id=$request->id;
+        /* $data->total_wager=$request->id;
+        $data->total_loss=$request->id; */
+        $data->save();
+        Toastr::success('Wager limit changed :)','Success');
+        return response()->json($data,200);
+        }
+        else {
+            return response()->json('Password not match!', 400);
+        }
+    }
+    public function account_deactivate(Request $request){
+        $data=User::find($request->id);
+        if ($request->question == Auth::user()->ans && Hash::check($request->password, $data->password)) {
+           $data=new Account_deactivate;
+           $data->user_id=$request->id;
+           $data->time=$request->time;
+           $data->reason=$request->reason;
+           $data->save();
+           Toastr::success('Thank you for submit','Success');
+           return response()->json(['data' => json_encode($request->all())], 200);
+        }
+        else {
+            return response()->json('Please enter correct value', 400);
+        }
+    }
+    public function support(Request $request){
+           $data=new Helpline;
+           $data->user_id=$request->id;
+           $data->email=$request->email;
+           $data->message=$request->message;
+           $data->priority=$request->priority;
+           $data->save();
+           Toastr::success('Thank you for submit','Success');
+           return response()->json(['data' => json_encode($request->all())], 200);
+
+    }
+    public function notification_id(Request $request,$id){
+
+           $not_view=\App\Notification::findOrFail($id);
+            $not_view->status=1;
+            $not_view->save();
+           return response()->json($not_view,200);
+    }
+
+    function balnceUpdate(){
+        if (Auth::check()) {
+           $balance = Auth::user()->account->total;
+           return response()->json($balance, 200);
+        }else {
+            $balance = 0;
+            return response()->json($balance, 200);
+        }
+    }
+
+}

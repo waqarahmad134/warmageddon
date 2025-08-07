@@ -1,0 +1,303 @@
+<?php
+
+namespace App\Http\Controllers\api;
+use App\User;
+use App\Account;
+use App\Notification;
+use App\Balance;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use DB;
+use Validator;
+use Auth;
+use Session;
+class UserController extends Controller
+{
+
+    public function login(Request $request)
+    {
+        /* $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'password' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        } */
+
+        $credentials = request(['email', 'password']);
+        if(!Auth::attempt($credentials)){
+
+            return response()->json(['error' => 'Unauthorised'], 401);
+        }
+        $user = $request->user();
+
+        $token =  $user->createToken('token')->accessToken;
+        $data='success';
+         return response()->json(['success' => true, 'token' => 'Bearer '.$token, 'user' => $data], 200);
+    }
+
+    //logout
+    public function logout(Request $request)
+    {
+
+        $isUser = $request->user()->token()->revoke();
+        if($isUser){
+            $success['message'] = "Successfully logged out.";
+            return $this->sendResponse($success);
+        }
+        else{
+            $error = "Something went wrong.";
+            return $this->sendResponse($error);
+        }
+
+
+    }
+    function customerProfile($id=null){
+        if (Auth::check()) {
+            $user = DB::table('users')
+            ->join('accounts', 'users.id', '=', 'accounts.user_id')
+            ->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+            ->select('users.id as user_id','users.user_name as username', 'accounts.total as token','accounts.total_spin', 'user_profiles.base_image as profile_pic')
+            ->where('users.id',Auth::user()->id)
+            ->first();
+
+             $user=[
+                'AwardedSpins'=> $user->total_spin,
+                'user_id' => $user->user_id,
+                'username' => $user->username,
+                'token' => $user->token,
+                'profile_pic' => $user->profile_pic,
+            ];
+        }else{
+            $user = [
+                'AwardedSpins'=> 0,
+                'user_id' => 'demo-440',
+                'username' => 'demo-user',
+                'token' => 999,
+                'profile_pic' => 'user/profile/avatar.png'
+            ];
+        }
+
+       //  $user=User::find(2)->account;
+        //   $user=Account::where('user_id',2)->select('user_id as id','total as token')->get();
+
+
+        return response()->json($user, 200);
+    }
+    function tokenUpdate(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'token' => 'required',
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        $user=User::find($request->id)->account;
+        $user->total=floatval($request->token);
+        $user->save();
+        $user=Account::where('user_id',$request->id)->select('user_id as id','total as token')->get();
+        return response()->json($user, 200);
+    }
+    function spinUpdate(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'AwardedSpinsLeft' => 'required',
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        $user=User::find($request->id)->account;
+        $user->total_spin=intval($request->AwardedSpinsLeft);
+        $user->save();
+        $user=Account::where('user_id',$request->id)->select('user_id as id','total_spin as AwardedSpinsLeft')->get();
+        return response()->json($user, 200);
+    }
+
+    function allToken(){
+        $data['user'] = User::where(['phone_verification'=>1])->count();
+        $data['all_token'] = Account::sum('total');
+        return response()->json($data, 200);
+    }
+    function BuyToken(){
+        try {
+            $user = DB::table('users')
+            ->join('accounts', 'users.id', '=', 'accounts.user_id')
+            ->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+            ->select('users.id as user_id','users.user_name as username', 'accounts.total as token', 'users.email as email')
+            ->where('users.id',Auth::user()->id)
+            ->first();
+            return response()->json($user, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error'=>'sorry not found'],201);
+        }
+
+    }
+
+    function tokenProfit(Request $r){
+
+        $validator = \Validator::make($r->all(), [
+            'token' => 'required',
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        try {
+            $user=User::find($r->id);
+            $acc=$user->account;
+            $acc->total=$acc->total - floatval($r->token);
+            $acc->save();
+            $system_token = Account::where('user_id',1)->first();
+            $system_token->total=$system_token->total + floatval($r->token);
+            $system_token->save();
+            $notification=new Notification;
+            $notification->user_id=$r->id;
+            $notification->message='You won '. $r->token .'$ token';
+            $notification->save();
+
+            //balance
+
+            $balance=new Balance;
+            $balance->balance =floatval($r->token);
+            $balance->method_id=1;
+            $balance->user_id = $r->id;
+            $balance->amount_sign = 'i';
+            $balance->account_id=$user->account->id;
+            $balance->type='game won';
+            $balance->from='casino';
+            $balance->to = $user->user_name;
+            $balance->save();
+            return response()->json(['sucess'=>' You won $'.$r->token], 200);
+       } catch (\Exception $e) {
+            return response()->json(['error'=>'Please try again'],201);
+        }
+
+    }
+    function tokenLoss(Request $r){
+
+        $validator = \Validator::make($r->all(), [
+            'token' => 'required',
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        try {
+            $user=User::find($r->id);
+            $acc=$user->account;
+            $acc->total=$acc->total+floatval($r->token);
+            $acc->save();
+            $system_token = Account::where('user_id',1)->first();
+            $system_token->total=$system_token->total - floatval($r->token);
+            $system_token->save();
+
+            $notification=new Notification;
+            $notification->user_id=$r->id;
+            $notification->message=getTranslated('token_lost1'). $r->token .getTranslated('token_lost1');
+            $notification->save();
+
+            //balance
+            $balance=new Balance;
+            $balance->balance = floatval($r->token);
+            $balance->method_id = 1;
+            $balance->user_id = $r->id;
+            $balance->amount_sign = 'l';
+            $balance->account_id=$user->account->id;
+            $balance->type='game lost';
+            $balance->from='casino';
+            $balance->to = $user->user_name;
+            $balance->save();
+
+            return response()->json(['sucess'=>' You lost $'.$r->token], 200);
+       } catch (\Exception $e) {
+        //return response()->json($r->all());
+            return response()->json(['error'=>'Please try again'],201);
+        }
+
+    }
+
+    function SystemToken(){
+        try{
+         $profit = Balance::where('amount_sign','i')->sum('balance');
+         $loss = Balance::where('amount_sign','l')->sum('balance');
+         $token = $loss - $profit;
+         $alltoken = Account::where('user_id','!=',1)->sum('total');
+         $system_token = Account::where('user_id',1)->first();
+         if ($alltoken < $system_token->total) {
+            $msg = [
+                'CasinoProfitstate' => 'InProfit'
+            ];
+         }else{
+            $msg = [
+                'CasinoProfitstate' => 'InLoss'
+            ];
+         }
+         return response()->json($msg, 200);
+        } catch (\Exception $e) {
+            //return response()->json($r->all());
+                return response()->json(['error'=>'Please try again'],201);
+            }
+    }
+    function userBan(Request $r){
+        $validator = \Validator::make($r->all(), [
+            'PlayerPlayStatus' => 'required',
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        try{
+         $user = User::findOrFail($r->id);
+          if(@$r->PlayerPlayStatus == 'PlayerBanned'){
+              $user->status = 0;
+              $user->save();
+              $msg=[
+                  'id' => $user->id,
+                  'PlayerPlayStatus' => 'PlayerBanned'
+              ];
+          }
+          else {
+             if($user->status == 1){
+                $msg=[
+                    'id' => $user->id,
+                    'PlayerPlayStatus' => 'PlayerCleared'
+                ];
+             }else{
+                $msg=[
+                    'id' => $user->id,
+                    'PlayerPlayStatus' => 'PlayerBanned'
+                ];
+             }
+          }
+
+         return response()->json($msg, 200);
+
+        } catch (\Exception $e) {
+           // return response()->json($e);
+                return response()->json(['error'=>'Please try again'],400);
+            }
+    }
+
+    function GamePlayStatus(){
+        try {
+            $msg =[
+                'PlayModeState' => Session::get('PlayModeState')
+            ];
+            if ($msg) {
+                return response()->json($msg, 200);
+            }
+            else {
+                $msg='no mode';
+                return response()->json($msg, 200);
+            }
+        } catch (\Exception $e) {
+                 return response()->json(['error'=>'Please try again'],400);
+             }
+    }
+
+
+}

@@ -1,0 +1,388 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+use Auth;
+use Session;
+use App\User;
+use App\Bonus;
+use App\Token;
+use Socialite;
+use App\Account;
+use Carbon\Carbon;
+use App\LoggedinUser;
+use App\ProsixWallet;
+use App\PropersixBonus;
+use App\SocialIdentity;
+use App\ProsixUserWallet;
+use App\ProsixWalletType;
+use App\RegistrationBonus;
+use Jenssegers\Agent\Agent;
+use App\LoggedinHistoryUser;
+use Illuminate\Http\Request;
+use Spatie\Permission\Models\Role;
+use App\Http\Controllers\Controller;
+use Brian2694\Toastr\Facades\Toastr;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
+
+class LoginController extends Controller
+{
+
+    /*
+    |--------------------------------------------------------------------------
+    | Login Controller
+    |--------------------------------------------------------------------------
+    |
+    | This controller handles authenticating users for the application and
+    | redirecting them to your home screen. The controller uses a trait
+    | to conveniently provide its functionality to your applications.
+    |
+    */
+
+    use AuthenticatesUsers;
+
+    /**
+     * Where to redirect users after login.
+     *
+     * @var string
+     */
+    protected $redirectTo = '/user/dashboard';
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('guest')->except('logout');
+    }
+
+    function authenticated(Request $request, $user)
+    {
+        // if (!$user->verified) {
+        //     auth()->logout();
+        //     Toastr::Error('You need to verify your account. We have sent you an activation code, please check your email.','Error');
+        //     return back();
+        // }
+        $agent = new Agent();
+        $user->last_login_at = Carbon::now();
+        $user->last_login_ip = $request->getClientIp();
+        $user->save();
+
+        $loggedIn=\App\LoggedinUser::firstOrCreate(['user_id' => $user->id]);
+        $loggedIn->user_id=$user->id;
+        $loggedIn->s_id = Session::getId();
+        $loggedIn->save();
+        $browser = $agent->browser();
+        $platform = $agent->platform();
+        $version = $agent->version($platform);
+        $login_history=\App\LoggedinHistoryUser::firstOrCreate(['user_id' => $user->id]);
+        $login_history->user_id=$user->id;
+        $login_history->device=$agent->device();
+        $login_history->browser=$browser.'/'.$version.'('.$platform.')';
+        $login_history->save();
+    }
+
+    protected function sendLoginResponse(Request $request)
+    {
+        if (Auth::user()->status != 1) {
+            auth()->logout();
+            Toastr::Error('You are blocked! If you have any questions, contact us.','Error');
+            return back();
+        }
+        if (!Auth::user()->hasRole(['User'])) {
+            auth()->logout();
+            Toastr::Error('You are not an user .Please register first! ','Error');
+            return back();
+        }
+        if (Auth::user()->verified != 1) {
+            auth()->logout();
+            Toastr::Error('You need to verify your account. We have sent you an activation code, please check your email.','Error');
+            return back();
+        }
+
+        /*   if (Auth::user()->phone_verification == 0) {
+            $token = Token::create([
+                'user_id' => Auth::user()->id
+            ]);
+            if ($token->sendCode()) {
+                session()->put("token_id", $token->id);
+                session()->put("user_id",  Auth::user()->id);
+
+                return redirect()->route('user.sms_send_verification');
+            }
+            $token->delete();// delete token because it can't be sent
+            return redirect('user-login')->withErrors([
+                "Your number is not correct ! Please enter your right number "
+            ]);
+        } */
+        $request->session()->regenerate();
+        $this->clearLoginAttempts($request);
+        $user=\App\User::where('email',$request->email)->first();
+        $now = Carbon::now();
+        $created_at = Carbon::parse($user['last_login_at']);
+        $diffHours = $created_at->diffInHours($now);
+
+        $userUp=\App\User::find(Auth::user()->id);
+        $agent = new Agent();
+        $userUp->last_login_at = Carbon::now();
+        $userUp->last_login_ip = $request->getClientIp();
+        $userUp->save();
+        if ((EligibleBonus($user->id)->count()) >= 1) {
+            $bonus_am = PropersixBonus::where('type','login')->where('status',1)->first();
+            if (isset($bonus_am)) {
+                $b_c = Bonus::where('add_bonus_id',@$bonus_am->id)->first();
+                if (is_null($b_c)) {
+                    $da = PropersixBonus::where('type','login')->where('ex_country','like', '%'.$user->profile->country.'%')->count();
+                    if ($da <= 0) {
+                        $earn = \DB::table('game_earnings')->where('user_id', Auth::id())->sum('token');
+                        if (@$bonus_am->wagering_req < @$earn) {
+                        if (@$bonus_am->specific_day) {
+                            $data = PropersixBonus::where('type','login')->where('specific_day','=',Carbon::today()->toDateString())->first();
+                            if (!is_null($data)) {
+                                $this->Bonus($user,$bonus_am);
+                            }
+                        }
+                        if (@$bonus_am->till) {
+                            $data = PropersixBonus::where('type','login')
+                                                ->where('from', '<=', Carbon::today()->toDateString())
+                                                ->where('till', '>=', Carbon::today()->toDateString())
+                                                ->first();
+                            if ($data->count() > 0) {
+                                $this->Bonus($user,$bonus_am);
+                            }
+                        }
+                        if (@$bonus_am->recurring) {
+                            if (@$bonus_am->recurring == 'w') {
+                                if (@$bonus_am->w_2 == date("W"))  {
+                                    $this->Bonus($user,$bonus_am);
+                                }
+                            }
+                            if (@$bonus_am->recurring == 'm') {
+                                if (@$bonus_am->w_2 == date("d"))  {
+                                    $this->Bonus($user,$bonus_am);
+                                }
+                            }
+                         }
+                        }
+                    }
+                }
+            }
+
+            $bonus_am = PropersixBonus::where('type','registration')->where('status',1)->first();
+            if (isset($bonus_am)) {
+                $b_c = Bonus::where('add_bonus_id',@$bonus_am->id)->first();
+                if (is_null($b_c)) {
+                    $da = PropersixBonus::where('type','login')->where('ex_country','like', '%'.$user->profile->country.'%')->count();
+                    if ($da <= 0) {
+                        $earn = \DB::table('game_earnings')->where('user_id', Auth::id())->sum('token');
+                        if (@$bonus_am->wagering_req < @$earn) {
+                        if (@$bonus_am->specific_day) {
+                            $data = PropersixBonus::where('type','login')->where('specific_day','=',Carbon::today()->toDateString())->first();
+                            if (!is_null($data)) {
+                                $this->Bonus($user,$bonus_am);
+                            }
+                        }
+                        if (@$bonus_am->till) {
+                            $data = PropersixBonus::where('type','login')
+                                                ->where('from', '<=', Carbon::today()->toDateString())
+                                                ->where('till', '>=', Carbon::today()->toDateString())
+                                                ->first();
+                            if ($data->count() > 0) {
+                                $this->Bonus($user,$bonus_am);
+                            }
+                        }
+                        if (@$bonus_am->recurring) {
+                            if (@$bonus_am->recurring == 'w') {
+                                if (@$bonus_am->w_2 == date("W"))  {
+                                    $this->Bonus($user,$bonus_am);
+                                }
+                            }
+                            if (@$bonus_am->recurring == 'm') {
+                                if (@$bonus_am->w_2 == date("d"))  {
+                                    $this->Bonus($user,$bonus_am);
+                                }
+                            }
+                         }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this->authenticated($request, $this->guard()->user())
+                ?: redirect()->intended($this->redirectPath());
+    }
+    public function showLoginForm()
+    {
+        return view('auth.adminlogin');
+    }
+
+    public function logout(Request $request)
+    {
+        if(\Auth::user()->logged_id){
+            \Auth::user()->logged_id->delete();
+        }
+        $this->guard()->logout();
+
+        $request->session()->invalidate();
+
+        return $this->loggedOut($request) ?: redirect('/');
+    }
+
+
+
+    public function handleProviderCallback($provider)
+   {
+
+       try {
+           $user = Socialite::driver($provider)->user();
+       } catch (\Exception $e) {
+           return redirect('user-login');
+       }
+       $authUser = $this->findOrCreateUser($user, $provider);
+       Auth::login($authUser, true);
+       if (Auth::check()) {
+         if (!Auth::user()->password) {
+            Session::put('get_id',Auth::user()->id);
+            auth()->logout();
+            return view('frontend.auth.social_register');
+         }
+         else {
+              Auth::login($authUser, true);
+            return redirect($this->redirectTo);
+         }
+
+       }else {
+           return redirect()->back();
+       }
+   }
+
+
+   public function findOrCreateUser($providerUser, $provider)
+   {
+
+       $account = SocialIdentity::whereProviderName($provider)
+                  ->whereProviderId($providerUser->getId())
+                  ->first();
+
+       if ($account) {
+           return $account->user;
+       } else {
+           $user = User::whereEmail($providerUser->getEmail())->first();
+           if (! $user) {
+               $user = User::create([
+                   'email' => $providerUser->getEmail(),
+                   'user_name'  => $providerUser->getName(),
+                   'verified' =>1,
+               ]);
+               $role_r = Role::where('name', '=','User')->firstOrFail();
+               $user->assignRole($role_r);
+
+           }
+
+           $user->identities()->create([
+               'provider_id'   => $providerUser->getId(),
+               'provider_name' => $provider,
+           ]);
+
+           return $user;
+       }
+   }
+    function Password_create(){
+        return view('frontend.auth.social_register');
+    }
+   function Password_store(Request $request){
+       $this->validate($request,[
+           'password' =>'required|min:8'
+       ]);
+       $user=User::find(Session::get('get_id'));
+       $user->password=Hash::make($request->password);
+       $user->save();
+       Auth::login($user, true);
+       if (@$user->phone_verification == 0) {
+        return view('frontend.auth.phone_verification');
+      }
+
+   }
+
+   protected function guard()
+    {
+        return Auth::guard();
+    }
+
+    function showLogin(){
+        return redirect('admin/login');
+    }
+
+    function Mail_Check($email){
+          $data = User::where('email',$email)->count();
+          if ($data > 0) {
+              return response()->json('This email is already used!',400);
+            }else {
+                return response()->json('success',200);
+          }
+    }
+    function username_Check($username){
+          $data = User::where('user_name',$username)->count();
+          if ($data > 0) {
+              return response()->json('This username is already taken',400);
+            }else {
+                return response()->json('success',200);
+          }
+    }
+
+    function Bonus($user,$data){
+        $bonus=new \App\Bonus;
+        $bonus->user_id = $user->id;
+        $bonus->add_bonus_id = @$data->id;
+        $bonus->amount= $data->bonus_amount;
+        $bonus->spin = @$data->free_spin;
+        $bonus->betsize = @$data->bet_size;
+        $bonus->line = @$data->lines;
+        $bonus->type = $data->type;
+        $bonus->from='casino';
+        $bonus->to=$user->user_name;
+        $bonus->save();
+       // logCreatedActivity($data,$bonus->type,$bonus);
+        // notification
+        $notification=new \App\Notification;
+        $notification->user_id=$user->id;
+        $notification->message='You got '.$data->bonus_amount.' token and '.$data->free_spin.' spin bonus for registration';
+        $notification->save();
+
+        $account=Account::find($user->account->id);
+        $account->total= $data->bonus_amount;
+        $account->total_spin= $data->free_spin;
+        $account->save();
+
+        $wal = ProsixWalletType::where('type',$bonus->type)->first();
+        if (is_null($wal)) {
+            $wallet_type= new ProsixWalletType();
+        } else {
+            $wallet_type = $wal;
+        }
+        $wallet_type->type=$bonus->type;
+        $wallet_type->save();
+        $wallet =new ProsixWallet();
+        $wallet->user_id = Auth::user()->id;
+        $wallet->amount = $data->bonus_amount;
+        $wallet->type_id =  $wallet_type->id;
+        $wallet->created_by=Auth::id();
+        $wallet->save();
+
+        $account=ProsixUserWallet::updateOrCreate(['user_id'=>$user->id]);
+        $account->free_token= $account->free_token + floatval(@$data->bonus_amount);
+        $account->free_spin= $account->free_spin + floatval(@$data->free_spin);
+        $account->type_id= $wallet_type->id;
+        $account->save();
+
+        $user_id  = Auth::id();
+        $logModel = $bonus;
+        $request = $bonus;
+        $log =  $bonus->type;
+        logCreatedActivity($user_id,$logModel,$request,$log);
+    }
+
+}

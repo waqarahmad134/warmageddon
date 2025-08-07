@@ -1,0 +1,691 @@
+<?php
+
+namespace App\Http\Controllers\api;
+use DB;
+use Auth;
+use Session;
+use App\User;
+use Validator;
+use App\Account;
+use App\Balance;
+use App\GameEarning;
+use App\Notification;
+use App\ProsixWallet;
+use App\ProsixUserWallet;
+use App\ProsixWalletType;
+use App\GameSession;
+use App\GameSessionChild;
+use App\UserBannedGame;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+
+class UserController extends Controller
+{
+
+
+    public function login(Request $request)
+    {
+        /* $validator = Validator::make($request->all(), [
+            'email' => 'required|string|email',
+            'password' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        } */
+
+        $credentials = request(['email', 'password']);
+        if(!Auth::attempt($credentials)){
+
+            return response()->json(['error' => 'Unauthorised'], 401);
+        }
+        $user = $request->user();
+
+        $token =  $user->createToken('token')->accessToken;
+        $data='success';
+         return response()->json(['success' => true, 'token' => 'Bearer '.$token, 'user' => $data], 200);
+    }
+
+    //logout
+    public function logout(Request $request)
+    {
+
+        $isUser = $request->user()->token()->revoke();
+        if($isUser){
+            $success['message'] = "Successfully logged out.";
+            return $this->sendResponse($success);
+        }
+        else{
+            $error = "Something went wrong.";
+            return $this->sendResponse($error);
+        }
+
+
+    }
+    function customerProfile($id=null , Request $request){
+
+        if (Auth::check()) {
+            $gameId = $request->session()->get('game_id');
+            $user = DB::table('users')
+            ->join('accounts', 'users.id', '=', 'accounts.user_id')
+            ->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+            ->select('users.id as user_id','users.user_name as username', 'accounts.total as token','accounts.total_spin', 'user_profiles.base_image as profile_pic')
+            ->where('users.id',Auth::user()->id)
+            ->first();
+
+            $data = ProsixUserWallet::where('user_id',Auth::id())->first();
+
+            $gSession = new \App\GameSession;
+            $gSession->user_id = $data->user_id;
+            $gSession->game_id = $gameId;
+            $gSession->free_spin = $data->free_spin;
+            $gSession->free_token = $data->free_token;
+            $gSession->token = $data->token;
+            $gSession->save();
+             $userDetail=[
+                 'game_id'=>$gameId,
+                'AwardedSpins'=> $data->free_spin,
+                'user_id' => Auth::id(),
+                'username' => $user->username,
+                'token' => $data->token + $data->free_token,
+               // 'free_token' => $data->free_token,
+                'profile_pic' => (file_exists( base_path() .'/' . $user->profile_pic )) ? $user->profile_pic : 'avatar.png',
+                'session_id' => $gSession->session_id
+            ];
+        }else{
+            $userDetail = [
+                'AwardedSpins'=> 100,
+                'user_id' => 'demo-440',
+                'username' => 'demo-user',
+                'token' => 999,
+                'profile_pic' => 'user/profile/avatar.png',
+                'session_id' => '1',
+                'game_id'=>'1'
+            ];
+        }
+        $user = getencryData($userDetail);
+        return response()->json($user ,  200);
+    }
+    public function updateChildSession(Request $request)
+    {
+        # code...
+        $gSessionChild = new \App\GameSessionChild;
+
+        $data = dcryptRequest($request->encoded_data);
+        $data = json_decode( json_encode($data) , true );
+
+        $gSessionChild->session_id = $data['session_id'];
+        $gSessionChild->user_id = $data['user_id'];
+        $gSessionChild->game_id = $data['game_id'];
+        $gSessionChild->awardedspin_left = $data['awardedspin_left'];
+        $gSessionChild->game_free_spins = $data['game_free_spins'];
+        $gSessionChild->total_session_bet_amount = $data['total_session_bet_amount']; ;
+        $gSessionChild->total_paid_spins = $data['total_paid_spins'];
+        $gSessionChild->current_credit = $data['current_credit'];
+        $gSessionChild->payline = $data['payline'];
+        $gSessionChild->bet_size = $data['bet_size'];
+        $gSessionChild->spin_type = $data['spin_type'];
+        $gSessionChild->status = $data['status'];
+        if($request->status == 'won' ){
+            $gSessionChild->amount_won = $data['amount'];
+            $gSessionChild->amount_loss = '';
+        }else{
+            $gSessionChild->amount_won = '';
+            $gSessionChild->amount_loss = $data['amount'];
+        }
+        $gSessionChild->save();
+        if($request->spin_type == 'paid'){
+            $this->calculateLP( $data['bet_size'] , $data['payline'], $data['user_id']);
+            $this->checkSpinMission( $data['user_id']);
+        }
+
+		if($gSessionChild->spin_type == 'paid' AND $gSessionChild->status == 'lost'){
+            $this->update_paid_loss($gSessionChild->current_credit , $gSessionChild->amount_loss , $gSessionChild->user_id);
+        }
+		if($gSessionChild->spin_type == 'paid' AND $gSessionChild->status == 'won'){
+            $this->update_paid_win($gSessionChild->current_credit , $gSessionChild->amount_won , $gSessionChild->user_id , $gSessionChild->bet_size , $gSessionChild->payline ,$gSessionChild->game_free_spins);
+        }
+
+		if($gSessionChild->spin_type == 'bonus' AND $gSessionChild->status == 'lost'){
+            $this->update_bonus_loss($gSessionChild->awardedspin_left , $gSessionChild->user_id);
+        }
+
+		if($gSessionChild->spin_type == 'bonus' AND $gSessionChild->status == 'won'){
+			$this->update_bonus_win($gSessionChild->awardedspin_left ,$gSessionChild->user_id , $gSessionChild->current_credit ,$gSessionChild->amount_won ,$gSessionChild->awardedspin_left);
+         }
+
+        return response()->json('Session created Successfully', 200);
+    }
+    protected function calculateLP($bet , $payLine,$userId)
+    {
+        $userWallet = \App\ProsixUserWallet::where('user_id' , $userId )->first();
+        $earn = $userWallet->earn_loyalty;
+        $loyalty_badge = \DB::table('loyalities')->where('from_range','<=',$earn)->where('to_range','>=',$earn)->orderBy('id','desc')->first();
+        $wgAmount = $bet*$payLine;
+        $lp = 0.1 * $wgAmount * $loyalty_badge->loyalty_multiplier;
+        $userWallet->earn_loyalty = $userWallet->earn_loyalty + $lp;
+        $userWallet->total_loyalty = $userWallet->total_loyalty + $lp;
+        $$userWallet->save();
+    }
+    protected function checkSpinMission($userId)
+    {
+        $curDate = date('Y-m-d');
+        $userMissionsPending = \App\UserMission::where('user_id',$userId)->where('status', '0')->where('mission_date',$curDate)->get();
+        foreach($userMissionsPending as $userMission){
+            $mission = \App\MissionBonus::find($userMission->mission_id);
+            $uMission = \App\UserMission::find($userMission->id);
+            $uMission->spending = $uMission->spending + 1;
+            if($uMission->spending == $mission->total_spin ){
+                $uMission->status = 1;
+                $this->transferReward($mission->id , $userId);
+            }
+            $uMission->save();
+        }
+    }
+    protected function transferReward($missionID , $userId)
+    {
+        # code...
+        $mission = \App\MissionBonus::find($missionID);
+        $userWallet = \App\ProsixUserWallet::where('user_id' , $userId )->first();
+        $userWallet->free_spin = $userWallet->free_spin + $mission->amount;
+        $userWallet->save();
+    }
+    public function Bonus_Winnings(Request $request)
+    {
+        # code...
+        $data = dcryptRequest($request->bonus_info);
+        $data = json_decode( json_encode($data) , true );
+
+        $gSessionChild = new \App\GameSessionChild;
+        $gSessionChild->session_id = $data['session_id'];
+        $gSessionChild->user_id = $data['user_id'];
+        $gSessionChild->game_id = $data['game_id'];
+        $gSessionChild->current_credit = $data['current_credit'];
+        $gSessionChild->status = 'won';
+        $gSessionChild->amount_won;
+		$userWallet = \App\ProsixUserWallet::where('user_id' , $data['user_id'] )->first();
+		$userWallet->token = $userWallet->token + $gSessionChild->amount_won;
+		$userWallet->save();
+        return response()->json('bonus added sucessfully', 200);
+    }
+
+    public function BanUserGame(Request $request)
+    {
+        # code...
+       /* for now we are using old ban process
+       $userBannedGame = new \App\UserBannedGame;
+        $userBannedGame->user_id = $request->user_id;
+        $userBannedGame->game_id = $request->game_id;
+        $userBannedGame->status = $request->status;
+        $userBannedGame->save();
+*/
+        return response()->json('User Ban Successfully', 200);
+    }
+    function tokenUpdate(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'token' => 'required',
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        $user=User::find($request->id)->account;
+        $user->total=floatval($request->token);
+        $user->save();
+        $user=Account::where('user_id',$request->id)->select('user_id as id','total as token')->get();
+        return response()->json($user, 200);
+    }
+
+    function spinUpdate(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'SpinLeft' => 'required',
+            'id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        $user=User::find($request->id)->account;
+        $user->total_spin=intval($request->SpinLeft);
+        $user->save();
+        $user=Account::where('user_id',$request->id)->select('user_id as id','total_spin as AwardedSpinsLeft')->get();
+        return response()->json($user, 200);
+    }
+
+    function allToken(){
+        $data['user'] = User::where(['phone_verification'=>1])->count();
+        $data['all_token'] = Account::sum('total');
+        return response()->json($data, 200);
+    }
+    function BuyToken(){
+        try {
+            $user = DB::table('users')
+            ->join('accounts', 'users.id', '=', 'accounts.user_id')
+            ->join('user_profiles', 'users.id', '=', 'user_profiles.user_id')
+            ->select('users.id as user_id','users.user_name as username', 'accounts.total as token', 'users.email as email')
+            ->where('users.id',Auth::user()->id)
+            ->first();
+            return response()->json($user, 200);
+        } catch (\Exception $e) {
+            return response()->json(['error'=>'sorry not found'],201);
+        }
+
+    }
+
+    function tokenProfit(Request $r){
+
+        $validator = \Validator::make($r->all(), [
+            'CasinoProfit' => 'required',
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        try {
+           /*  $user=User::find($r->id);
+            $acc=$user->account;
+            $acc->total=$acc->total - floatval($r->CasinoProfit);
+            $acc->save();
+            $system_token = Account::where('user_id',1)->first();
+            $system_token->total=$system_token->total + floatval($r->CasinoProfit);
+            $system_token->save(); */
+
+            $type = 'game_lost';
+            $from = $r->id;
+            $to ='casino';
+            $amount = floatval($r->CasinoProfit);
+           // Wallet($amount,$type,$from,$to);
+
+            $notification=new Notification;
+            $notification->user_id = $r->id;
+            $notification->message=getTranslated('token_lost1'). $r->CasinoProfit .getTranslated('token_lost1');
+            $notification->save();
+
+            $wal = ProsixWalletType::where('type', $type)->first();
+            if (is_null($wal)) {
+                $wallet_type= new ProsixWalletType();
+            } else {
+                $wallet_type = $wal;
+            }
+            $wallet_type->type= $type;
+            $wallet_type->save();
+
+            $wallet =new ProsixWallet();
+            $wallet->user_id = $r->id;
+            $wallet->amount = $amount;
+            $wallet->type_id =  $wallet_type->id;
+            $wallet->created_by = $r->id;
+            $wallet->save();
+
+            $userWallet=ProsixUserWallet::updateOrCreate(['user_id'=> $r->id]);
+            $userWallet->token= $userWallet->token - $amount;
+            $userWallet->type_id=$wallet_type->id;
+            $userWallet->save();
+
+            $AdminWallet=ProsixUserWallet::where('user_id',1)->first();
+            $AdminWallet->token= $AdminWallet->token + $amount;
+            $AdminWallet->type_id=$wallet_type->id;
+            $AdminWallet->save();
+
+            $user_id  =  $r->id;
+            $logModel = $userWallet;
+            $request = $userWallet;
+            $log =  $type;
+            logCreatedActivity($user_id,$logModel,$request,$log);
+
+            return response()->json(['sucess'=>' You loss $'.$r->CasinoProfit], 200);
+       } catch (\Exception $e) {
+            return response()->json(['error'=>'Please try again'],201);
+        }
+
+    }
+    function tokenLoss(Request $r){
+
+        $validator = \Validator::make($r->all(), [
+            'CasinoLoss' => 'required',
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        try {
+
+
+           /*  $user=User::find($r->id);
+            $acc=$user->account;
+            $acc->total=$acc->total+floatval($r->CasinoLoss);
+            $acc->save();
+
+            $system_token = Account::where('user_id',1)->first();
+            $system_token->total=$system_token->total - floatval($r->CasinoLoss);
+            $system_token->save(); */
+
+            $notification=new Notification;
+            $notification->user_id=$r->id;
+            $notification->message='You won '. $r->CasinoLoss .'$ token';
+            $notification->save();
+
+            $type = 'game_won';
+            $from = $r->id;
+            $to ='casino';
+            $amount = intval($r->CasinoLoss);
+            $wal = ProsixWalletType::where('type', $type)->first();
+            if (is_null($wal)) {
+                $wallet_type= new ProsixWalletType();
+            } else {
+                $wallet_type = $wal;
+            }
+            $wallet_type->type= $type;
+            $wallet_type->save();
+
+            $wallet =new ProsixWallet();
+            $wallet->user_id = $r->id;
+            $wallet->amount = $amount;
+            $wallet->type_id =  $wallet_type->id;
+            $wallet->created_by = $r->id;
+            $wallet->save();
+
+            $userWallet=ProsixUserWallet::updateOrCreate(['user_id'=> $r->id]);
+            $userWallet->token= $userWallet->token + $amount;
+            $userWallet->type_id=$wallet_type->id;
+            $userWallet->save();
+
+            $AdminWallet=ProsixUserWallet::where('user_id',1)->first();
+            $AdminWallet->token= $AdminWallet->token - $amount;
+            $AdminWallet->type_id=$wallet_type->id;
+            $AdminWallet->save();
+            $user_id  = $r->id;
+            $logModel = $userWallet;
+            $request = $userWallet;
+            $log =  $type;
+            logCreatedActivity($user_id,$logModel,$request,$log);
+
+            return response()->json(['sucess'=>' You won $'.$r->CasinoLoss], 200);
+       } catch (\Exception $e) {
+        //return response()->json($r->all());
+            return response()->json(['error'=>'Please try again'],201);
+        }
+
+    }
+
+    function SystemToken(){
+        try{
+         $profit = Balance::where('amount_sign','l')->sum('balance');
+         $loss = Balance::where('amount_sign','i')->sum('balance');
+         $token = $profit - $loss;
+        // $alltoken = Account::where('user_id','!=',1)->sum('total');
+         $system_token = Account::where('user_id',1)->first();
+         if ($token < $system_token->admin_total) {
+            $msg = [
+                'CasinoProfitstate' => 'InProfit'
+            ];
+         }else{
+            $msg = [
+                'CasinoProfitstate' => 'InLoss'
+            ];
+         }
+
+       /*   $number = rand(0,1);
+
+         if($number == 0) {
+            $msg = [
+                'CasinoProfitstate' => 'InProfit'
+            ];
+         }else{
+            $msg = [
+                'CasinoProfitstate' => 'InLoss'
+            ];
+         } */
+         return response()->json($msg, 200);
+        } catch (\Exception $e) {
+            //return response()->json($r->all());
+                return response()->json(['error'=>'Please try again'],201);
+            }
+    }
+
+    function userBan(Request $r){
+        $validator = \Validator::make($r->all(), [
+            'PlayerStatus' => 'required',
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        try{
+         $user = User::findOrFail($r->id);
+          if(@$r->PlayerPlayStatus == 'PlayerBanned'){
+              $user->status = 0;
+              $user->save();
+              $msg=[
+                  'id' => $user->id,
+                  'PlayerPlayStatus' => 'PlayerBanned'
+              ];
+          }
+          else {
+             if($user->status == 1){
+                $msg=[
+                    'id' => $user->id,
+                    'PlayerPlayStatus' => 'PlayerCleared'
+                ];
+             }else{
+                $msg=[
+                    'id' => $user->id,
+                    'PlayerPlayStatus' => 'PlayerBanned'
+                ];
+             }
+          }
+
+         return response()->json($msg, 200);
+
+        } catch (\Exception $e) {
+           // return response()->json($e);
+                return response()->json(['error'=>'Please try again'],400);
+            }
+    }
+
+    function GamePlayStatus(){
+        //\Cache::get('PlayModeState')['id']
+    return response()->json( Session::get('lol'), 200);
+        try {
+
+            $msg =[
+                'PlayModeState' => Session::get('PlayModeState')
+            ];
+            if (Session::has('PlayModeState')) {
+                return response()->json($msg, 200);
+            }
+            else {
+                $msg =[
+                    'PlayModeState' => 'no mode'
+                ];
+                return response()->json($msg, 200);
+            }
+        } catch (\Exception $e) {
+                 return response()->json(['error'=>'Please try again'],400);
+             }
+    }
+    function GameId(){
+        try {
+            if (Session::get('game_id')) {
+                $msg =[
+                    'game_id' => Session::get('game_id')
+                ];
+                return response()->json($msg, 200);
+            }
+            else {
+                $msg =[
+                    'game_id' => 0
+                ];
+                return response()->json($msg, 200);
+            }
+        } catch (\Exception $e) {
+                 return response()->json(['error'=>'Please try again'],400);
+             }
+    }
+
+    function Gameinfo(Request $r){
+        $validator = \Validator::make($r->all(), [
+            'user_id' => 'required',
+            'game_id' => 'required',
+            'spin' => 'required',
+            'token' => 'required',
+            'betsize' => 'required',
+            'line' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        try{
+            $loyal = LoyalitySettings::find($r->game_id);
+            if (is_null($loyal)) {
+                $token = $r->token * 0.01;
+            }else {
+                $token = $r->token * (100/$loyal->rate);
+            }
+            $data = new GameEarning();
+            $data->user_id = $r->user_id;
+            $data->game_id = $r->game_id;
+            $data->token = $token;
+            $data->spin = $r->spin;
+            $data->betsize = $r->betsize;
+            $data->line = $r->line;
+            $data->save();
+
+            $acc= Account::where('user_id',$r->id)->first();
+            $acc->total_spin=$acc->total_spin+floatval( $r->spin);
+            $acc->save();
+
+            $system_token = Account::where('user_id',1)->first();
+            $system_token->total_spin=$system_token->total_spin - floatval( $r->spin);
+            $system_token->save();
+
+            return response()->json('success', 200);
+        } catch (\Exception $e) {
+            return response()->json($e, 200);
+            return response()->json(['error'=>'Please try again'],400);
+        }
+    }
+
+
+	function update_paid_loss($current_credit , $amount_loss , $userId)
+	{
+        $userWallet = \App\ProsixUserWallet::where('user_id' , $userId )->first();
+        $tok = \App\TokenCurrency::where(['status'=>1,'doller'=>1])->first();
+		if($userWallet->free_token > 0)
+		{
+			if($amount_loss > $userWallet->free_token)
+			{
+				$amount_loss_after = $amount_loss - $userWallet->freetoken;
+				$userWallet->free_token = 0;
+                $userWallet->token = $userWallet->token - $amount_loss_after;
+                $usdLoss = $amount_loss_after * ( 1 / $tok->pley6_token );
+                $userWallet->usd = $userWallet->usd - $usdLoss;
+				$userWallet->save();
+				if($current_credit == $userWallet->token + $userWallet->free_token)
+				{
+					$msg = 'updation successfull and verified';
+				}
+				else
+				{
+					$msg = 'transaction successfull but not verified';
+				}
+			}
+
+			else
+			{
+				$userWallet->free_token = $userWallet->free_token - $amount_loss;
+				$userWallet->save();
+				if($current_credit == $userWallet->token + $userWallet->free_token)
+				{
+					$msg = 'updation successfull and verified';
+				}
+				else
+				{
+					$msg = 'transaction successfull but not verified';
+				}
+			}
+
+		}
+		else
+		{
+            $userWallet->token = $userWallet->token - $amount_loss;
+            $usdLoss = $amount_loss * ( 1 / $tok->pley6_token );
+            $userWallet->usd = $userWallet->usd - $usdLoss;
+			$userWallet->save();
+				if($current_credit == $userWallet->token + $userWallet->free_token)
+				{
+					$msg = 'updation successfull and verified';
+				}
+				else
+				{
+					$msg = 'transaction successfull but not verified';
+				}
+		}
+
+		return response()->json($msg, 200);
+	}
+
+	function update_paid_win($current_credit ,$amount_won , $userId , $bet_size , $payline ,$game_free_spins)
+	{
+        $tok = \App\TokenCurrency::where(['status'=>1,'doller'=>1])->first();
+		$userWallet = \App\ProsixUserWallet::where('user_id' , $userId )->first();
+        $userWallet->token = $userWallet->token + $amount_won;
+        $amountWon = $amount_won * ( 1 / $tok->pley6_token );
+        $userWallet->usd = $userWallet->usd + $amountWon;
+		$userWallet->free_spin = $$userWallet->free_spin + $game_free_spins;
+		$userWallet->save();
+	}
+
+	function update_bonus_loss($awardedspin_left ,$userId)
+	{
+		$userWallet = \App\ProsixUserWallet::where('user_id' , $userId )->first();
+		$userWallet->free_spin = $awardedspin_left;
+		$userWallet->save();
+
+	}
+
+	function update_bonus_win($awardedspin_left ,$userId , $current_credit ,$amount_won)
+	{
+	    $tok = \App\TokenCurrency::where(['status'=>1,'doller'=>1])->first();
+        $userWallet = \App\ProsixUserWallet::where('user_id' , $userId )->first();
+		$userWallet->free_spin = $awardedspin_left;
+        $userWallet->token = $userWallet->token + $amount_won;
+        $amountWon = $amount_won * ( 1 / $tok->pley6_token );
+        $userWallet->usd = $userWallet->usd + $amountWon;
+		$userWallet->save();
+
+	}
+
+    public function backend_status_update(Request $request)
+    {
+        //echo 'hi';die();
+        # code...
+        $validator = \Validator::make($request->all(), [
+            'status' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 400);
+        }
+        $backendstatus=$request->status;
+        $queryState=DB::table('backend')->insert(
+            ['status' => $backendstatus]
+            );
+            if($queryState) {
+                return response()->json('status updated Successfully', 200);
+                // the query succeed
+                } else {
+                    return response()->json('status update Failed', 200);
+                    // the query failed
+                    }
+
+    }
+public function backend_status(Request $request)
+    {
+        $last_row = DB::table('backend')->latest()->first();
+                return response()->json($last_row->status ,  200);
+
+    }
+
+}

@@ -1,0 +1,131 @@
+version: '3'
+services:
+
+  # #PHP Service
+  # app:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   restart: unless-stopped
+  #   working_dir: /var/www/html
+  #   volumes:
+  #     - ./homedir:/var/www/html:z
+  #     # - ./logs:/var/www/html/storage/logs:z
+  #   ports:
+  #     - "9000:9000"
+  #   networks:
+  #     - app-network
+  #     - queue-network
+
+  #Nginx Service
+  # webserver:
+  #   image: nginx:alpine
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./homedir:/var/www/html:z
+  #     - ./ssl_keys:/var/www/ssl:z
+  #     - ./weblogs/log/nginx:/var/log/nginx
+  #     - .docker/nginx/conf.d/:/etc/nginx/conf.d/
+  #     - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+  #   networks:
+  #     - app-network
+  #   ports:
+  #     - "443:443" #first is host port second is nginx internal port
+  #   healthcheck:
+  #     test: wget --quiet --tries=1 --spider http://localhost || exit 1z
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 5
+  #   depends_on: 
+  #     - app
+  
+  # Composer Container
+  # composer:
+  #   image: composer:latest
+  #   container_name: composer
+  #   entrypoint: ["composer", "install"]
+  #   volumes:
+  #     - ./homedir:/var/www/html:z
+  #   working_dir: /var/www/html
+  #   depends_on:
+  #     - app
+  #   networks:
+  #     - app-network
+
+  # Redis Container
+  redis:
+    image: redis:4.0
+    container_name: app_redis
+    restart: unless-stopped
+    ports:
+      - "6377:6377"
+#    networks:
+#      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli","ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Artisan Contianer
+  # artisan:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: artisan
+  #   volumes:
+  #     - ./homedir:/var/www/html:z
+  #   working_dir: /var/www/html
+  #   entrypoint: ['php', '/var/www/html/artisan']
+  #   networks:
+  #     - app-network
+  
+  #mysql container
+  mysql_casino_db:
+    image: mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: mytestingdatabase
+    volumes:
+      - /var/www/datastorage/current:/var/lib/mysql:rw
+      - /var/www/datastorage/seed:/docker-entrypoint-initdb.d/:rw
+    ports:
+      - 3306:3306/tcp
+#    networks:
+#      - app-network
+#    depends_on:
+#      - app
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 3310:8080
+#    networks:
+#      - app-network
+    depends_on:
+      - mysql_casino_db
+      
+
+  # Load Balancer using Reverse Proxy 
+#  reverse-proxy:
+#    image: nginx:1.17.10
+#    container_name: reverse_proxy
+#    depends_on: 
+#      - webserver1
+#      - webserver2
+#    volumes: 
+#      - /var/log/nginx:/var/log/nginx
+#      - .docker/nginx/reverse_proxy/nginx.conf:/etc/nginx/nginx.conf
+#    ports:
+#      - "${APP_PORT}:80"
+#    restart: unless-stopped
+#    networks:
+#      - app-network 
+
+#Docker Networks
+# networks:
+#   app-network:
+#     driver: bridge
+#   queue-network:
+#     driver: bridge

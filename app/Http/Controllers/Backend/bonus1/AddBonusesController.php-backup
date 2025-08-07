@@ -1,0 +1,697 @@
+<?php
+
+namespace App\Http\Controllers\Backend\bonus;
+
+use DB;
+use Session;
+use App\User;
+use App\AddGame;
+use App\AddBonus;
+use App\BonusCode;
+use App\LeaveNote;
+use App\Notification;
+use App\Http\Requests;
+use App\PropersixBonus;
+use App\RegistrationBonus;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use Brian2694\Toastr\Facades\Toastr;
+use Illuminate\Support\Facades\Auth;
+use Spatie\Activitylog\Models\Activity;
+
+class AddBonusesController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\View\View
+     */
+    function BonusTypeCheck(Request $request){
+        try {
+                Session::put('bonus_type',$request->type);
+                return  redirect('dash-panel/add-bonuses');
+            } catch (\Exception $e) {
+                Toastr::error('Something went wrong! please try again','Error');
+            return redirect()->back();
+        }
+    }
+    public function index(Request $request)
+    {
+        // $data =Activity::all();
+        // dd($data);
+        $user =  User::role('User')->get();
+        $games =  AddGame::where('status','on')->orderBy('order','desc')->get();
+        $deposit_bonus = PropersixBonus::where('type','deposit')->latest()->get();
+        return view('backend.bonus.add-bonuses.bonus_add', compact('user','games','deposit_bonus'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function create()
+    {
+        return view('backend\bonus.add-bonuses.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'bonus_name' => 'required|string',
+            'bonus_code' => 'required',
+            'bonus_amount' => 'required|string',
+            'withdrawal_limit' => 'required',
+            'uses_limit' => 'required',
+            'deposit_bonus' => 'required',
+            'bonus_limit_amount' => 'sometimes|nullable',
+            'expire_date' => 'sometimes|nullable|date',
+            'status' => 'sometimes|nullable|string',
+            'typew' => 'sometimes|nullable|string',
+            'base_image' => 'sometimes|nullable',
+        ]);
+        $add_bonuses=new AddBonus();
+        $add_bonuses->bonus_name=$request->bonus_name;
+        $add_bonuses->b_code=$request->bonus_code;
+        $add_bonuses->b_amount=$request->bonus_amount;
+        $add_bonuses->w_limit=$request->withdrawal_limit;
+        $add_bonuses->u_limit=$request->uses_limit;
+        $add_bonuses->d_limit=$request->deposit_bonus;
+        $add_bonuses->limit_amount=$request->bonus_limit_amount;
+        $add_bonuses->expire_date=$request->expire_date;
+        $add_bonuses->type=$request->typew;
+        $add_bonuses->status=$request->status;
+        $image=$request->base_image;
+            if($image){
+                $imageName=time().'.'.$image->getClientOriginalName();
+                $image->move('bonus/', $imageName);
+                $add_bonuses->image=$imageName;
+            }
+        $add_bonuses->save();
+        Toastr::success('Bonus  added successfully','Success');
+        return redirect()->back();
+    }
+    function Registration_Bonus(Request $request){
+        $request->validate([
+            'bonus_name' => 'required|string',
+            'bonus_amount' => 'required|integer|min:0',
+            'free_spin' => 'required|integer',
+            'w_2' => 'required|string',
+            'recurring' => 'required|string',
+            'status' => 'required|string',
+        ]);
+       //dd($request->all());
+       DB::beginTransaction();
+        try {
+              $data = new PropersixBonus();
+              $data->type ='registration';
+              $data->bonus_name = $request->bonus_name;
+              $data->bonus_amount = $request->bonus_amount;
+              $data->free_spin = $request->free_spin;             
+              if (@$request->ex_country) {
+                  $data->ex_country = implode(",", $request->ex_country);
+              }
+              if (@$request->bet_size) {
+                $data->bet_size = $request->bet_size;
+              }
+              if (@$request->lines) {
+                $data->lines = $request->lines;
+              }
+              if (@$request->wagering_req) {
+                $data->wagering_req = $request->wagering_req;
+              }
+              if (@$request->from) {
+                $data->from = date('y-m-d',strtotime($request->from));
+              }
+              if (@$request->till) {
+                $data->till = date('y-m-d',strtotime($request->till));
+              }
+              if (@$request->specific_day) {
+                $data->specific_day = date('y-m-d',strtotime($request->specific_day));
+              }
+              if (@$request->aff_source) {
+                $data->aff_source = $request->aff_source;
+              }
+              $data->recurring = $request->recurring;
+              $data->w_2 = $request->w_2;
+              $data->status = $request->status;
+              $data->save();
+                $user_id  = Auth::id();
+                $logModel = $data;
+                $request = $request->all();
+                $log = 'registration_bonus';
+                logCreatedActivity($user_id,$logModel,$request,$log);
+
+              DB::commit();
+              Toastr::success('Registration bonus added successfully','Success');
+              return redirect()->route('list-bonuses.index');
+            } catch (\Exception $e) {
+                Toastr::error('Something went wrong! please try again','Error');
+            return redirect()->back();
+        }
+    }
+    function login_Bonus(Request $request){
+        $request->validate([
+            'bonus_name' => 'required|string',
+            'bonus_amount' => 'required|integer|min:0',
+            'free_spin' => 'required|integer',
+            'w_2' => 'required|string',
+            'recurring' => 'required|string',
+            'status' => 'required|string',
+        ]);
+       //dd($request->all());
+       DB::beginTransaction();
+        try {
+              $data = new PropersixBonus();
+              $data->type ='login';
+              $data->bonus_name = $request->bonus_name;
+              $data->bonus_amount = $request->bonus_amount;
+              $data->free_spin = $request->free_spin;
+             /*  if (@$request->games) {
+                  $data->game = implode(",", $request->games);
+              } */
+              if (@$request->ex_country) {
+                  $data->ex_country = implode(",", $request->ex_country);
+              }
+              if (@$request->users) {
+                  $data->users = implode(",", $request->users);
+              }
+              if (@$request->vip_level) {
+                  $data->vip_level = implode(",", $request->vip_level);
+              }
+              if (@$request->bet_size) {
+                $data->bet_size = $request->bet_size;
+              }
+              if (@$request->lines) {
+                $data->lines = $request->lines;
+              }
+              if (@$request->wagering_req) {
+                $data->wagering_req = $request->wagering_req;
+              }
+              if (@$request->from) {
+                $data->from = date('y-m-d',strtotime($request->from));
+              }
+              if (@$request->till) {
+                $data->till = date('y-m-d',strtotime($request->till));
+              }
+              if (@$request->specific_day) {
+                $data->specific_day = date('y-m-d',strtotime($request->specific_day));
+              }
+              if (@$request->aff_source) {
+                $data->aff_source = $request->aff_source;
+              }
+              $data->recurring = $request->recurring;
+              $data->w_2 = $request->w_2;
+              $data->status = $request->status;
+              $data->save();
+                $user_id  = Auth::id();
+                $logModel = $data;
+                $request = $request->all();
+                $log = 'registration_bonus';
+                logCreatedActivity($user_id,$logModel,$request,$log);
+              DB::commit();
+              Toastr::success('Login bonus added successfully','Success');
+              return redirect()->route('list-bonuses.index');
+            } catch (\Exception $e) {
+                Toastr::error('Something went wrong! please try again','Error');
+            return redirect()->back();
+        }
+    }
+    function code_Bonus(Request $request){
+        $request->validate([
+            'bonus_name' => 'required|string',
+            'bonus_amount' => 'required|integer|min:0',
+            'bonus_code' => 'required|string',
+            'free_spin' => 'required|integer',
+            'status' => 'required|string',
+        ]);
+       //dd($request->all());
+        try {
+              $data = new PropersixBonus();
+              $data->type ='code';
+              $data->bonus_name = $request->bonus_name;
+              $data->bonus_amount = $request->bonus_amount;
+              $data->bonus_code = $request->bonus_code;
+              $data->free_spin = $request->free_spin;
+             /*  if (@$request->games) {
+                  $data->game = implode(",", $request->games);
+              } */
+              if (@$request->ex_country) {
+                  $data->ex_country = implode(",", $request->ex_country);
+              }
+              if (@$request->bet_size) {
+                $data->bet_size = $request->bet_size;
+              }
+              if (@$request->lines) {
+                $data->lines = $request->lines;
+              }
+              if (@$request->wagering_req) {
+                $data->wagering_req = $request->wagering_req;
+              }
+              if (@$request->from) {
+                $data->from = date('y-m-d',strtotime($request->from));
+              }
+              if (@$request->till) {
+                $data->till = date('y-m-d',strtotime($request->till));
+              }
+              if (@$request->specific_day) {
+                $data->specific_day = date('y-m-d',strtotime($request->specific_day));
+              }
+              $data->status = $request->status;
+              $data->save();
+
+              $user_id  = Auth::id();
+              $logModel = $data;
+              $request = $request->all();
+              $log = 'bonuse_code';
+              logCreatedActivity($user_id,$logModel,$request,$log);
+
+              Toastr::success('Bonus code added successfully','Success');
+              return redirect()->route('list-bonuses.index');
+            } catch (\Exception $e) {
+                Toastr::error('Something went wrong! please try again','Error');
+            return redirect()->back();
+        }
+    }
+    function deposit_Bonus(Request $request){
+        $request->validate([
+            'bonus_name' => 'required|string',
+            'bonus_code' => 'required|string',
+            'bonus_amount' => 'sometimes|nullable|integer|min:0',
+            'free_spin' => 'required|integer',
+            'w_2' => 'required|string',
+            'recurring' => 'required|string',
+            'status' => 'required|string',
+        ]);
+        try {
+              $data = new PropersixBonus();
+              $data->type ='deposit';
+              $data->bonus_name = $request->bonus_name;
+              $data->bonus_code = $request->bonus_code;
+              $data->free_spin = $request->free_spin;
+             /*  if (@$request->games) {
+                  $data->game = implode(",", $request->games);
+              } */
+              if (@$request->ex_country) {
+                  $data->ex_country = implode(",", $request->ex_country);
+              }
+              if (@$request->users) {
+                  $data->users = implode(",", $request->users);
+              }
+              if (@$request->chained) {
+                  $data->chained = implode(",", $request->chained);
+              }
+              if (@$request->vip_level) {
+                  $data->vip_level = implode(",", $request->vip_level);
+              }
+              if (@$request->percent_amount) {
+                $data->percent_amount = $request->percent_amount;
+              }
+              if (@$request->max_amount) {
+                $data->max_amount = $request->max_amount;
+              }
+              if (@$request->bonus_amount) {
+                $data->bonus_amount = $request->bonus_amount;
+              }
+              if (@$request->bet_size) {
+                $data->bet_size = $request->bet_size;
+              }
+              if (@$request->lines) {
+                $data->lines = $request->lines;
+              }
+              if (@$request->wagering_req) {
+                $data->wagering_req = $request->wagering_req;
+              }
+              if (@$request->ex_chain) {
+                $data->ex_chain = date('y-m-d',strtotime($request->ex_chain));
+              }
+              if (@$request->from) {
+                $data->from = date('y-m-d',strtotime($request->from));
+              }
+              if (@$request->till) {
+                $data->till = date('y-m-d',strtotime($request->till));
+              }
+              if (@$request->specific_day) {
+                $data->specific_day = date('y-m-d',strtotime($request->specific_day));
+              }
+              if (@$request->aff_source) {
+                $data->aff_source = $request->aff_source;
+              }
+              $data->recurring = $request->recurring;
+              $data->w_2 = $request->w_2;
+              $data->status = $request->status;
+              $data->save();
+              $user_id  = Auth::id();
+              $logModel = $data;
+              $request = $request->all();
+              $log = 'deposit';
+              logCreatedActivity($user_id,$logModel,$request,$log);
+
+              Toastr::success('Deposit bonus  added successfully','Success');
+              return redirect()->route('list-bonuses.index');
+            } catch (\Exception $e) {
+                Toastr::error('Something went wrong! please try again','Error');
+            return redirect()->back();
+        }
+    }
+    function method_Bonus(Request $request){
+        $request->validate([
+            'bonus_name' => 'required|string',
+            'deposit_method' => 'required|string',
+            'bonus_amount' => 'sometimes|nullable|integer|min:0',
+            'free_spin' => 'required|integer',
+            'w_2' => 'required|string',
+            'recurring' => 'required|string',
+            'status' => 'required|string',
+        ]);
+        try {
+              $data = new PropersixBonus();
+              $data->type ='method';
+              $data->bonus_name = $request->bonus_name;
+              $data->deposit_method = $request->deposit_method;
+              $data->free_spin = $request->free_spin;
+              if (@$request->games) {
+                  $data->game = implode(",", $request->games);
+              }
+              if (@$request->ex_country) {
+                  $data->ex_country = implode(",", $request->ex_country);
+              }
+              if (@$request->users) {
+                  $data->users = implode(",", $request->users);
+              }
+              if (@$request->vip_level) {
+                  $data->vip_level = implode(",", $request->vip_level);
+              }
+              if (@$request->percent_amount) {
+                $data->percent_amount = $request->percent_amount;
+              }
+              if (@$request->max_amount) {
+                $data->max_amount = $request->max_amount;
+              }
+              if (@$request->bonus_amount) {
+                $data->bonus_amount = $request->bonus_amount;
+              }
+              if (@$request->bet_size) {
+                $data->bet_size = $request->bet_size;
+              }
+              if (@$request->lines) {
+                $data->lines = $request->lines;
+              }
+              if (@$request->wagering_req) {
+                $data->wagering_req = $request->wagering_req;
+              }
+              if (@$request->from) {
+                $data->from = date('y-m-d',strtotime($request->from));
+              }
+              if (@$request->till) {
+                $data->till = date('y-m-d',strtotime($request->till));
+              }
+              if (@$request->specific_day) {
+                $data->specific_day = date('y-m-d',strtotime($request->specific_day));
+              }
+              if (@$request->aff_source) {
+                $data->aff_source = $request->aff_source;
+              }
+              $data->recurring = $request->recurring;
+              $data->w_2 = $request->w_2;
+              $data->status = $request->status;
+              $data->save();
+              Toastr::success('Payment method bonus  added successfully','Success');
+              return redirect()->route('list-bonuses.index');
+            } catch (\Exception $e) {
+                Toastr::error('Something went wrong! please try again','Error');
+            return redirect()->back();
+        }
+    }
+    function cashback_Bonus(Request $request){
+        $request->validate([
+            'bonus_name' => 'required|string',
+            'min_loss' => 'required|string',
+            'bonus_amount' => 'sometimes|nullable|integer|min:0',
+            'w_2' => 'required|string',
+            'recurring' => 'required|string',
+            'status' => 'required|string',
+        ]);
+        try {
+              $data = new PropersixBonus();
+              $data->type ='cashback';
+              $data->bonus_name = $request->bonus_name;
+              $data->min_loss = $request->min_loss;
+              if (@$request->ex_country) {
+                  $data->ex_country = implode(",", $request->ex_country);
+              }
+              if (@$request->users) {
+                  $data->users = implode(",", $request->users);
+              }
+              if (@$request->vip_level) {
+                  $data->vip_level = implode(",", $request->vip_level);
+              }
+              if (@$request->percent_amount) {
+                $data->percent_amount = $request->percent_amount;
+              }
+              if (@$request->max_amount) {
+                $data->max_amount = $request->max_amount;
+              }
+              if (@$request->bonus_amount) {
+                $data->bonus_amount = $request->bonus_amount;
+              }
+              if (@$request->from) {
+                $data->from = date('y-m-d',strtotime($request->from));
+              }
+              if (@$request->till) {
+                $data->till = date('y-m-d',strtotime($request->till));
+              }
+              if (@$request->specific_day) {
+                $data->specific_day = date('y-m-d',strtotime($request->specific_day));
+              }
+              if (@$request->aff_source) {
+                $data->aff_source = $request->aff_source;
+              }
+              $data->recurring = $request->recurring;
+              $data->w_2 = $request->w_2;
+              $data->status = $request->status;
+              $data->save();
+              Toastr::success('Cashback bonus  added successfully','Success');
+              return redirect()->route('list-bonuses.index');
+            } catch (\Exception $e) {
+                Toastr::error('Something went wrong! please try again','Error');
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     *
+     * @return \Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $addbonus = AddBonus::findOrFail($id);
+
+        return view('backend\bonus.add-bonuses.show', compact('addbonus'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     *
+     * @return \Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $addbonus = AddBonus::findOrFail($id);
+
+        return view('backend\bonus.add-bonuses.edit', compact('addbonus'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param  int  $id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update(Request $request, $id)
+    {
+        
+        $requestData = $request->all();
+        
+        $addbonus = AddBonus::findOrFail($id);
+        $addbonus->update($requestData);
+
+        return redirect('add-bonuses')->with('flash_message', 'AddBonus updated!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        AddBonus::destroy($id);
+
+        return redirect('add-bonuses')->with('flash_message', 'AddBonus deleted!');
+    }
+    public function status_change($id){
+        $user = PropersixBonus::find($id);  
+        if($user->status== 1){
+            $user->status = 0;
+            $msg = 'Bonus Deactive successfully !';
+        }else{
+            $user->status = 1;
+            $msg = 'Bonus active successfully !';
+        }
+        $user->save();
+        Toastr::success($msg,'Success');
+        return redirect()->back();
+    }
+
+    function RegistrationBonus(){
+        try {
+            $data=RegistrationBonus::latest()->get();
+           return view('backend.bonus.user-sign.registration_bonus', compact('data'));
+        } catch (\Exception $e) {
+            Toastr::error('Something weng wrong please try again!');
+            return redirect()->back();
+        }
+    }
+    function RegistrationBonusStore(Request $request){
+        $request->validate([
+            'title' => 'required|string',
+            'bonus' => 'required',
+            'type' => "required|unique:registration_bonuses,type",
+        ]);
+        try {
+            $data=new RegistrationBonus();
+            $data->title = $request->title;
+            $data->bonus = $request->bonus;
+            $data->type = $request->type;
+            $data->save();
+            Toastr::success('Succesfully added user bonus!');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Toastr::error('Something weng wrong please try again!');
+            return redirect()->back();
+        }
+    }
+    function RegistrationBonusEdit($id){
+        
+        try {
+            $data=RegistrationBonus::latest()->get();
+            $edit = RegistrationBonus::find($id);
+            return view('backend.bonus.user-sign.registration_bonus', compact('edit','data'));
+        } catch (\Exception $e) {
+            Toastr::error('Something weng wrong please try again!');
+            return redirect()->back();
+        }
+    }
+
+    function RegistrationBonusUpdate(Request $request, $id){
+        $request->validate([
+            'title' => 'required|string',
+            'bonus' => 'required',
+            'type' => "required|unique:registration_bonuses,type,". $id,
+        ]);
+        try {
+            $data=RegistrationBonus::find($id);
+            $data->title = $request->title;
+            $data->bonus = $request->bonus;
+            $data->type = $request->type;
+            $data->save();
+            Toastr::success('Succesfully updated user bonus!');
+            return redirect()->route('RegistrationBonus');
+        } catch (\Exception $e) {
+            Toastr::error('Something weng wrong please try again!');
+            return redirect()->back();
+        }
+    }
+    function RegistrationBonusStatus($id){
+        try {
+            $data=RegistrationBonus::find($id);
+            if($data->status){
+                $data->status = 0;
+                $msg = 'Bonus disable successfully !';
+            }else{
+                $data->status = 1;
+                $msg = 'Bonus active successfully !';
+            }
+            $data->save();
+            Toastr::success($msg);
+            return redirect()->route('RegistrationBonus');
+        } catch (\Exception $e) {
+            Toastr::error('Something weng wrong please try again!');
+            return redirect()->back();
+        }
+    }
+    // LeaveNote
+    function UsaerBonus(Request $request,$id){
+        $request->validate([
+            'bonus_code' => 'required|string|min:6',
+            'bonus' => 'required|integer|min:1',
+            'bonus_type' => 'required|',
+            'valid_date' =>'required|after:today'
+        ]);
+        DB::beginTransaction();
+        try {
+            $data = new BonusCode();
+            $data->bonus_code = $request->bonus_code;
+            $data->user_id = $id;
+            $data->bonus = $request->bonus;
+            $data->bonus_type = $request->bonus_type;
+            $data->valid_date = date('y-m-d',strtotime($request->valid_date));
+            $data->save();
+            if ($request->bonus_type == 1) {
+                $promo = 'Bonus';
+            }else {
+                $promo = 'Spin';
+            }
+            $not = new Notification();
+            $not->user_id = $id;
+            $not->message = 'You have got promo '. $promo.' code "'.$request->bonus_code.'"';
+            $not->save();
+            DB::commit();
+            Toastr::success('Succesfully user bonus added!');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Toastr::error('Something weng wrong please try again!');
+            return redirect()->back();
+        }
+    }
+    function UsaerLeaveMessage(Request $request,$id){
+        $request->validate([
+            'body' => 'required|',
+        ]);
+        DB::beginTransaction();
+        try {
+            $data = new LeaveNote();
+            $data->user_id = $id;
+            $data->body = $request->body;
+            $data->save();
+            
+            $not = new Notification();
+            $not->user_id = $id;
+            $not->message = $request->body;
+            $not->save();
+            DB::commit();
+            Toastr::success('Succesfully user bonus added!');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            Toastr::error('Something weng wrong please try again!');
+            return redirect()->back();
+        }
+    }
+}

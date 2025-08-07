@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Http\Controllers\Backend\UserManagement;
+
+use App\Http\Requests;
+use App\Http\Controllers\Controller;
+use Brian2694\Toastr\Facades\Toastr;
+use App\ListUser;
+use App\User;
+use Illuminate\Http\Request;
+
+class ListUsersController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function index(Request $request)
+    {
+        $user=User::latest()->get();
+       // dd($user);
+        return view('backend.user-management.list-users.user-list',compact('user'));
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function create()
+    {
+        return view('backend.user-management.list-users.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function store(Request $request)
+    {
+        
+        $requestData = $request->all();
+        
+        ListUser::create($requestData);
+
+        return redirect('list-users')->with('flash_message', 'ListUser added!');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     *
+     * @return \Illuminate\View\View
+     */
+    public function show($id)
+    {
+        $listuser = ListUser::findOrFail($id);
+
+        return view('backend.user-management.list-users.show', compact('listuser'));
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     *
+     * @return \Illuminate\View\View
+     */
+    public function edit($id)
+    {
+        $listuser = ListUser::findOrFail($id);
+
+        return view('backend.user-management.list-users.edit', compact('listuser'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param  int  $id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function update(Request $request, $id)
+    {
+        
+        $requestData = $request->all();
+        
+        $listuser = ListUser::findOrFail($id);
+        $listuser->update($requestData);
+
+        return redirect('list-users')->with('flash_message', 'ListUser updated!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function destroy($id)
+    {
+        ListUser::destroy($id);
+
+        return redirect('list-users')->with('flash_message', 'ListUser deleted!');
+    }
+    public function status_change($id){
+        $user = User::find($id);  
+        if($user->status){
+            $user->status = 0;
+            $msg = 'User disable successfully !';
+        }else{
+            $user->status = 1;
+            $msg = 'User active successfully !';
+        }
+        $user->save();
+        Toastr::success('Admin '.$msg);
+        return redirect()->back();
+    }
+    public function delete($id){
+        User::destroy($id);
+        Toastr::success('Admin ','User delete successfully');
+        return redirect()->back();
+    }
+}
