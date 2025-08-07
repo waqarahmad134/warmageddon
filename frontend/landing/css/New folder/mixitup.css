@@ -1,0 +1,128 @@
+*,
+*:before,
+*:after {
+    box-sizing: inherit;
+}
+@font-face {
+    src: url(../fonts/Apex-Mk3-Medium.ttf);
+    font-family: amm; 
+}
+#gallery {
+    overflow: hidden;
+}
+
+#filters {
+    margin: 0px 0px 40px;
+    padding: 0px 10px 10px 10px;
+    list-style: none;
+    overflow: hidden;
+    text-align: center;
+}
+#filters li {
+    display: inline-block;
+}
+#filters li p {
+    display: block;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    transition: all ease-in-out 0.25s;
+    color: #ffffff;
+    padding: 0px 20px;
+    font-family: amm;
+}
+#filters li p img {
+    display: inline-block;
+    max-height: 34px;
+}
+#filters li p span {
+    color: inherit; 
+    font-family: inherit;
+    display: block;
+    padding-top: 10px;
+    transition: all ease-in-out 0.25s;
+}
+#filters li:hover p {
+    filter: drop-shadow(2px 2px 4px rgba(226,162,54,0.6));
+}
+#filters li:hover p span {
+    color: #e2a236;
+}
+#filters li p.active {
+    color: #e2a236;
+}
+
+.gallery-item {
+    float: left;
+    width: 16.66%;
+    padding: 10px;
+    position: relative;
+    z-index: 10;
+    display: none;
+}
+
+.inside {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+.inside img {
+    height: 100%;
+    width: 100%;
+    transform: scale(1);
+    transition: all 0.3s ease-in-out;
+}
+.inside .ex-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 45px;
+    height: auto;
+    transform: scale(1);
+    transition: all 0.3s ease-in-out;
+    z-index: 10;
+}
+.inside .exclucive {
+    width: 70px;
+    height: auto;;
+}
+.details {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    opacity: 0;
+}
+.gall-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url(../images/image-frame.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    z-index: 2;
+    transition: all 0.7s ease-in-out;
+}
+
+.details {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3;
+    transition: all 0.3s ease-in-out;
+}
+
+.gallery-item:hover .details {
+    opacity: 1;
+}
+.gallery-item:hover .inside img {
+    transform: scale(1.15);
+}
+.gallery-item:hover .inside .ex-icon {
+    transform: scale(1);
+}
