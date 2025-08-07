@@ -1,0 +1,10 @@
+diff a/resources/views/frontend/casino_user/dashboard.blade.php b/resources/views/frontend/casino_user/dashboard.blade.php	(rejected hunks)
+@@ -196,7 +196,7 @@
+                                                                                             {{--<h3 id="demo" class="just-grd"></h3>--}}
+                                                                                             <table class="table-responsive">
+                                                                                                 <tr >
+-                                                                                                    @if(!in_array($item->id , $userMissionsPending))
++                                                                                                    {{--@if(!in_array($item->id , $userMissionsPending))
+                                                                                                         <th  style="padding: 20px; border: 1px solid #e2a236; !important;">
+                                                                                                             @if($item->total_spin != 0 || $item->total_spin != '')
+                                                                                                                 <p>Spins Required : {{ isset($item->total_spin) ?  $item->total_spin.'  ': 0}} Spins</p>

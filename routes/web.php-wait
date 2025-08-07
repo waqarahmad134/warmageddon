@@ -1,0 +1,410 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the "web" middleware group. Now create something great!
+|
+*/
+
+Route::group([ 'middleware' => ['cr'] ],function(){   
+    Route::get('/clear-cache', 'HomeController@cache_clear');
+    // page 
+    Route::get('/', 'Frontend\HomeController@index')->name('index');
+    Route::get('affliate-registration/{id}', 'Frontend\HomeController@affliate')->name('affliate_registration');
+    Route::post('contact/send', 'Frontend\ContactController@send')->name('contact.send');
+    Route::get('/about-us', 'Frontend\HomeController@about')->name('about');
+    Route::get('/contact-us', 'Frontend\HomeController@contact')->name('front.contact');
+    Route::get('/game', 'Frontend\HomeController@allgame')->name('allgame');
+    Route::get('/games', 'Frontend\HomeController@games')->name('games');
+    Route::post('get-city', 'Frontend\HomeController@get_city')->name('get_cit');
+    Route::get('user-login', 'Frontend\HomeController@login')->name('user.login');
+    Route::get('user-registration', 'Frontend\HomeController@Registration')->name('user.registration');
+    Route::middleware('cors')->group(function(){
+    });
+    Route::get('state/{name}','CountryController@state');
+});
+
+
+
+//phone verification 
+Route::group(['namespace' => 'Frontend','middleware' => ['User']],function(){
+    Route::get('user/verification','VerificationController@Resend'); 
+    Route::get('verification','VerificationController@mobile_verification')->name('verify-mobile');
+    Route::post('sms-verifiction','VerificationController@verification')->name('user.mobile_vefication');
+    Route::get('code-verifiction','VerificationController@SendCodeForm')->name('user.sms_send_verification');
+    Route::post('code-verifiction','VerificationController@storeCodeForm')->name('user.code_verification');
+});
+
+Route::group(['namespace' => 'Frontend','middleware' => ['auth']],function(){
+
+   //currency convert
+   Route::get('user/currency-convert/{amount}','UserController@currency_convert');
+   //currency convert
+    Route::post('user/profile/edit/{id}','UserController@update')->name('user.update');
+    Route::post('user/security/edit/{id}','UserController@Security')->name('user.Security');
+    Route::post('user/password/edit/{id}','UserController@PasswordChange')->name('user.PasswordChange');
+    Route::post('user/profile-picture/update','UserController@Proupdate')->name('user.Proupdate');
+    Route::post('user/account-deactivate','UserController@account_deactivate')->name('user.account_deactivate');
+    Route::post('user/support','UserController@support')->name('user.support');
+    Route::post('user/notification-view/{id}','UserController@notification_id')->name('user.notification_id');
+
+    Route::post('user/paymnet','PaymentController@paymentDeposit')->name('paymentDeposit');
+    //withdraw
+    Route::post('user/withdraw','PaymentController@paymentWithdraw')->name('paymentWithdraw');
+    // favorite game 
+    Route::get('user/favorite-game/{id}','UserController@favorite_game')->name('user.favorite_game');
+    Route::get('user/favorite-game-data/','UserController@Get_favorite_game');
+    //bonus apply
+    Route::get('user/apply-bonus/{bonus_code}','UserController@Apply_Bonus');
+    // inbox delete
+    Route::get('user/inbox-delete/{ids}/{val}','UserController@InboxDelete');
+    Route::get('user/inbox-see/{val}','UserController@InboxSee');
+    Route::get('user/buy-token/{val}','UserController@BuyToken');
+    Route::get('user/mission-start','UserController@MissionStart');
+    Route::get('user/vip-shop-start','UserController@ShopStart');
+
+});
+Route::get('api/PlayMode', 'Backend\\GamesManagement\\AddGamesController@test');
+
+Route::group(['prefix'=>'api','namespace' => 'api',/* 'middleware' => ['auth'] */],function(){   
+    Route::get('user', 'UserController@customerProfile');
+    Route::options('user', 'UserController@customerProfile');
+
+});
+
+Route::group(['prefix'=>'admin','namespace'=>'Admin\auth'], function (){
+
+    Route::resource('users', 'UserController');
+    Route::resource('roles', 'RoleController');
+    Route::resource('permissions', 'PermissionController');
+    Route::get('login', 'LoginController@showLoginForm')->name('admin.login');
+    Route::post('login', 'LoginController@login')->name('admin.login');
+    Route::post('logout', 'LoginController@logout')->name('admin.logout');
+});
+// user 
+Route::get('login','Auth\LoginController@showLogin')->name('login');
+ Route::post('login','Auth\LoginController@login')->name('user_login');     
+ Route::post('register','Auth\RegisterController@register')->name('register');                        
+Route::post('logout','Auth\LoginController@logout')->name('logout');
+Route::get('/user/verify/{token}', 'Auth\RegisterController@verifyUser');
+Route::get('play/{id}', 'Backend\\GamesManagement\\AddGamesController@play_game')->name('play_game');
+Route::get('demo-play/{id}', 'Backend\\GamesManagement\\AddGamesController@demo_play_game')->name('demo_play_game');
+Route::resource('dash-panel/user-profile', 'Registration\AddUserController\\UserProfileController')->middleware('userAdmin');
+Route::get('user-logout', 'Registration\AddUserController\\UserProfileController@user_logout')->name('user_logout')->middleware('auth');
+Route::post('game-title', 'Registration\AddUserController\\UserProfileController@game_title')->name('game_title')->middleware('auth');
+
+Route::group(['namespace' => 'Frontend','prefix' => 'user','middleware' => ['User']],function(){
+    Route::get('dashboard','UserController@dashboard')->name('user.panel');
+    Route::get('profile-show','UserController@user_profile')->name('user.user_profile');
+    Route::get('affiliate-list','UserController@aff_list')->name('user.aff_list');
+    Route::get('affiliate-nickname','UserController@aff_nickname')->name('user.aff_nickname');
+    Route::get('affiliate-invite','UserController@aff_invite')->name('user.aff_invite');
+    Route::get('transac-history','UserController@transac_his')->name('user.transac_his');
+    Route::get('withdraw','UserController@withdraw')->name('user.withdraw');
+    Route::get('deposite','UserController@deposite')->name('user.deposite');
+    Route::get('deposite-limit','UserController@deposite_limit')->name('user.deposite_limit');
+    Route::get('account-statement','UserController@acc_statement')->name('user.acc_statement');
+    Route::get('payment-method','UserController@payment')->name('user.payment');
+    Route::get('bouns','UserController@bouns')->name('user.bounscode');
+    Route::get('gameplay-history','UserController@gameplay_his')->name('user.gameplay_his');
+    Route::get('account-data','UserController@acc_data')->name('user.acc_data');
+    Route::get('account-bank','UserController@acc_bank')->name('user.acc_bank');
+
+    Route::post('account-document','UserController@acc_document')->name('user.acc_document');
+   
+});
+
+Route::group(['namespace' => 'Backend','prefix' => 'dash-panel','middleware' => ['auth','userAdmin']],function(){
+	
+    Route::get('/', 'HomeController@index')->name('dashboard');
+    // customer inffo
+    Route::get('online-customer','customer\\CustomerController@OnlinecustomerInfo')->name('OnlinecustomerInfo');
+    Route::get('customer-user','customer\\CustomerController@customerInfo')->name('customer_info');
+    Route::get('customer-view/{id}','customer\\CustomerController@customerView')->name('user.customer_view');
+    Route::get('online-customer-view/{id}','customer\\CustomerController@Online_customer_view')->name('user.online_customer_view');
+    Route::get('logout-customer-view/{id}','customer\\CustomerController@Online_customer_logout')->name('user.Online_customer_logout');
+    Route::get('customer','customer\\CustomerController@customer')->name('user.customer_search');
+    Route::post('customer-search','customer\\CustomerController@customerSearch')->name('admin.customerSearch');
+    ////////////////
+    Route::resource('affiliate-settings', 'affiliate\\AffiliateSettingsController');
+    Route::resource('completed-payments', 'affiliate\\CompletedPaymentsController');
+    Route::resource('list-affiliates', 'affiliate\\ListAffiliatesController');
+    Route::resource('send-payments', 'affiliate\\SendPaymentsController');
+    Route::resource('activated-bonuses', 'bonus\\ActivatedBonusesController');
+    // start bonus
+    Route::post('bonus/type', 'bonus\\AddBonusesController@BonusTypeCheck')->name('admin.BonusTypeCheck');
+    Route::resource('add-bonuses', 'bonus\\AddBonusesController');
+    Route::post('user-bonus/{id}','bonus\\AddBonusesController@UsaerBonus')->name('UsaerBonus');
+    // Registration bonus
+    Route::post('registration-bonus/','bonus\\AddBonusesController@Registration_Bonus')->name('Registration_Bonus');
+    Route::post('login-bonus/','bonus\\AddBonusesController@login_Bonus')->name('admin.login_Bonus');
+    Route::post('deposit-bonus/','bonus\\AddBonusesController@deposit_Bonus')->name('admin.deposit_Bonus');
+    Route::post('code-bonus/','bonus\\AddBonusesController@code_Bonus')->name('admin.code_Bonus');
+    Route::post('method-bonus/','bonus\\AddBonusesController@method_Bonus')->name('admin.method_Bonus');
+    Route::post('cashback-bonus/','bonus\\AddBonusesController@cashback_Bonus')->name('admin.cashback_Bonus');
+
+    // end bonus
+    Route::post('user-leave-message/{id}','bonus\\AddBonusesController@UsaerLeaveMessage')->name('UsaerLeaveMessage');
+    Route::post('status-bonuses/{id}', 'bonus\\AddBonusesController@status_change')->name('bonus.status_change');
+    Route::resource('list-bonuses', 'bonus\\ListBonusesController');
+    Route::resource('add-free-chips', 'bonus\\AddFreeChipsController');
+    Route::resource('add-rewards', 'bonus\\AddRewardsController');
+    Route::resource('list-rewards', 'bonus\\ListRewardsController');
+    // start login registration bonus
+    Route::get('user-bonus','bonus\\AddBonusesController@RegistrationBonus')->name('RegistrationBonus');
+    Route::post('user-bonus-store','bonus\\AddBonusesController@RegistrationBonusStore')->name('RegistrationBonusStore');
+    Route::get('user-bonus-edit/{id}','bonus\\AddBonusesController@RegistrationBonusEdit')->name('RegistrationBonusEdit');
+    Route::post('user-bonus-update/{id}','bonus\\AddBonusesController@RegistrationBonusUpdate')->name('RegistrationBonusUpdate');
+    Route::get('user-bonus-status/{id}','bonus\\AddBonusesController@RegistrationBonusStatus')->name('RegistrationBonusStatus');
+    //end login registration bonus
+    
+    //Loyality
+    Route::get('add-loyality', 'bonus\\LoyalityController@loyality_add')->name('admin.loyality_add');
+    Route::post('add-loyality-store', 'bonus\\LoyalityController@loyality_Store')->name('admin.loyality_Store');
+    Route::get('loyality-list', 'bonus\\LoyalityController@index')->name('admin.loyality_list');
+    Route::get('loyality/general-loyalty-edit/{id}', 'bonus\\LoyalityController@loyalty_Edit')->name('loyality.loyalty_Edit');
+    Route::post('loyality/general-loyalty-update/{id}', 'bonus\\LoyalityController@loyality_Update')->name('admin.loyality_Update');
+    Route::post('loyality/tier-loyalty-status/{id}', 'bonus\\LoyalityController@Loyalty_status')->name('loyality.Loyalty_status');
+    Route::delete('loyality/tier-loyalty-delete/{id}', 'bonus\\LoyalityController@loyalty_delete')->name('loyality.loyalty_delete');
+    
+    Route::get('loyality/general-setting', 'bonus\\LoyalityController@general_setting')->name('admin.general_setting');
+    Route::post('loyality/general-setting-store', 'bonus\\LoyalityController@general_settingStore')->name('admin.general_setting_store');
+    Route::post('loyality/general-setting-update/{id}', 'bonus\\LoyalityController@general_setting_Update')->name('admin.general_setting_Update');
+    Route::get('loyality/general-setting-edit/{id}', 'bonus\\LoyalityController@settng_Edit')->name('loyality.settng_Edit');
+    Route::post('loyality/setting-status/{id}', 'bonus\\LoyalityController@settng_status')->name('loyality.settng_status');
+    Route::delete('loyality/setting-delete/{id}', 'bonus\\LoyalityController@settng_delete')->name('loyality.settng_delete');
+    
+    //Loyality
+    //Shop
+    Route::get('add-shops', 'bonus\\AddShopsController@create')->name('admin.add_shop');
+    Route::post('add-shop-store', 'bonus\\AddShopsController@store')->name('admin.shop_store');
+    Route::get('list-shops', 'bonus\\AddShopsController@ShopList')->name('admin.shop_list');
+    Route::get('edit-shop/{id}', 'bonus\\AddShopsController@edit')->name('admin.edit_shop');
+    Route::post('add-shop-update/{id}', 'bonus\\AddShopsController@update')->name('admin.shop_update');
+    Route::post('status-shops/{id}', 'bonus\\AddShopsController@status_change')->name('shop.status_change');
+    Route::delete('delete-shops/{id}', 'bonus\\AddShopsController@destroy')->name('shop.destroy');
+
+    //Shop
+    //Shop
+    Route::get('add-mission', 'bonus\\MissionController@create')->name('admin.add_mission');
+    Route::get('mission-view/{id}', 'bonus\\MissionController@show')->name('admin.show_mission');
+    Route::post('add-mission-store', 'bonus\\MissionController@store')->name('admin.mission_store');
+    Route::get('list-mission', 'bonus\\MissionController@missionList')->name('admin.mission_list');
+    Route::get('edit-mission/{id}', 'bonus\\MissionController@edit')->name('admin.edit_mission');
+    Route::post('add-mission-update/{id}', 'bonus\\MissionController@update')->name('admin.mission_update');
+    Route::post('status-mission/{id}', 'bonus\\MissionController@status_change')->name('mission.status_change');
+    Route::delete('delete-mission/{id}', 'bonus\\MissionController@destroy')->name('mission.destroy');
+
+   
+    //Mission Type
+  /*   Route::get('add-mission-type', 'bonus\\MissionController@mission_type_create')->name('admin.add_mission_type');
+    Route::post('mission-type-store', 'bonus\\MissionController@mission_type_store')->name('admin.mission_type_store');
+    Route::get('list-mission-type', 'bonus\\MissionController@mission_type')->name('admin.mission_type_list');
+    Route::get('edit-mission-type/{id}', 'bonus\\MissionController@mission_type_edit')->name('admin.edit_mission_type');
+    Route::post('mission-type-update/{id}', 'bonus\\MissionController@mission_type_update')->name('admin.mission_type_update');
+    Route::post('status-mission-type/{id}', 'bonus\\MissionController@mission_type_status_change')->name('type_mission.status_change');
+    Route::delete('delete-mission-type/{id}', 'bonus\\MissionController@mission_type_destroy')->name('type_mission.destroy');
+ */
+    //Shop
+    
+    // Route::resource('list-shops', 'bonus\\ListShopsController');
+    Route::resource('purchases-shops', 'bonus\\PurchasesShopsController');
+    Route::resource('admin-language', 'casinoSetting\\AdminLanguageController');
+    Route::resource('casino-payout', 'casinoSetting\\CasinoPayoutController');
+    Route::resource('environment-settings', 'casinoSetting\\EnvironmentSettingsController');
+    // casino general settings start
+    Route::get('general-settings', 'casinoSetting\\GeneralSettingsController@index')->name('general-settings.index');
+    Route::post('general-settings-store', 'casinoSetting\\GeneralSettingsController@store')->name('general-settings.store');
+    Route::get('notify-Transaction-settings', 'casinoSetting\\GeneralSettingsController@notify_Transaction_settings')->name('notify_Transaction_settings');
+    Route::post('Transaction-settings-store', 'casinoSetting\\GeneralSettingsController@store_Transaction_settings')->name('store_Transaction_settings');
+    // casino general settings end
+    Route::resource('responsible-gaming', 'casinoSetting\\ResponsibleGamingController');
+    Route::resource('staff-access', 'casinoSetting\\StaffAccessController');
+    Route::resource('system-limits', 'casinoSetting\\SystemLimitsController');
+    Route::resource('content-page-add', 'contentManagement\\ContentPageAddController');
+    Route::resource('content-page-list', 'contentManagement\\ContentPageListController');
+    Route::resource('email-templates-add', 'contentManagement\\EmailTemplatesAddController');
+    Route::resource('email-templates-list', 'contentManagement\\EmailTemplatesListController');
+    Route::resource('layout-section', 'contentManagement\\LayoutSectionController');
+    Route::resource('link-manager', 'contentManagement\\LinkManagerController');
+    Route::resource('template-map', 'contentManagement\\TemplateMapController');
+    Route::resource('credit-transfers', 'finances\\CreditTransfersController');
+    Route::resource('financial-events', 'finances\\FinancialEventsController');
+    Route::resource('my-earnings', 'finances\\MyEarningsController');
+    Route::resource('payment-methods', 'finances\\PaymentMethodsController');
+
+    Route::get('deposits', 'finances\\DepositsController@index')->name('deposits.index');
+    Route::get('deposit-view/{id}', 'finances\\DepositsController@show')->name('deposits.show');
+
+    Route::get('withdrawals', 'finances\\WithdrawalsController@index')->name('withdrawals.index');
+    Route::get('withdrawal-view/{id}', 'finances\\WithdrawalsController@View')->name('withdrawals.View');
+    Route::post('withdraw-approve/{id}', 'finances\\WithdrawalsController@Approve')->name('admin.userwithdraw_Approve');
+    Route::post('withdraw-reject/{id}', 'finances\\WithdrawalsController@Reject')->name('admin.UserWithdrawReject');
+
+    Route::resource('earnings', 'LotteryRng\\EarningsController');
+    Route::resource('generate-lottery-ticket', 'LotteryRng\\GenerateLotteryTicketController');
+    Route::resource('list-lottery-tickets', 'LotteryRng\\ListLotteryTicketsController');
+    Route::resource('prizes-grant-prize', 'LotteryRng\\PrizesGrantPrizeController');
+    Route::resource('list-prizes', 'LotteryRng\\ListPrizesController');
+    Route::resource('prize-settings', 'LotteryRng\\PrizeSettingsController');
+    Route::resource('view-results', 'LotteryRng\\ViewResultsController');
+    Route::resource('backup-databases', 'Maintenance\\BackupDatabasesController');
+    Route::resource('build-images', 'Maintenance\\BuildImagesController');
+    Route::resource('clear-logins', 'Maintenance\\ClearLoginsController');
+    Route::resource('clear-financial-records', 'Maintenance\\ClearFinancialRecordsController');
+    Route::resource('clear-gameplay-records', 'Maintenance\\ClearGameplayRecordsController');
+    Route::resource('clear-staff-logs', 'Maintenance\\ClearStaffLogsController');
+    Route::resource('clear-blacklist-ips', 'Maintenance\\ClearBlacklistIpsController');
+    Route::resource('clear-multiplayers', 'Maintenance\\ClearMultiplayersController');
+    Route::resource('clear-tournaments', 'Maintenance\\ClearTournamentsController');
+    Route::resource('clear-messages', 'Maintenance\\ClearMessagesController');
+    Route::resource('file-integrity-lists', 'Maintenance\\FileIntegrityListsController');
+    Route::resource('reset-all-banks', 'Maintenance\\ResetAllBanksController');
+    Route::resource('reset-all-jackpots', 'Maintenance\\ResetAllJackpotsController');
+    Route::resource('reset-casinos', 'Maintenance\\ResetCasinosController');
+    Route::resource('services-health-monitor', 'Maintenance\\ServicesHealthMonitorController');
+    Route::resource('create-tournaments', 'MultiTournaments\\CreateTournamentsController');
+    Route::resource('free-mass-tickets', 'MultiTournaments\\FreeMassTicketsController');
+    Route::resource('free-tickets', 'MultiTournaments\\FreeTicketsController');
+    Route::resource('list-tournaments', 'MultiTournaments\\ListTournamentsController');
+    Route::resource('settings', 'MultiTournaments\\SettingsController');
+    Route::resource('tournament-gameplays', 'MultiTournaments\\TournamentGameplaysController');
+    Route::resource('view-all-tickets', 'MultiTournaments\\ViewAllTicketsController');
+    Route::resource('bingo-settings', 'MultiPlayerBingo\\BingoSettingsController');
+    Route::resource('view-bingo-tickets', 'MultiPlayerBingo\\ViewBingoTicketsController');
+    Route::resource('view-bingo-results', 'MultiPlayerBingo\\ViewBingoResultsController');
+    Route::resource('card-settings', 'MultiPlayerCard\\CardSettingsController');
+    Route::resource('view-bets', 'MultiPlayerCard\\ViewBetsController');
+    Route::resource('card-view-results', 'MultiPlayerCard\\CardViewResultsController');
+    Route::resource('races-settings', 'MultiPlayerRaces\\RacesSettingsController');
+    Route::resource('races-view-bets', 'MultiPlayerRaces\\RacesViewBetsController');
+    Route::resource('races-view-results', 'MultiPlayerRaces\\RacesViewResultsController');
+    Route::resource('roulette-settings', 'MultiPlayerRoulette\\RouletteSettingsController');
+    Route::resource('roulette-view-bets', 'MultiPlayerRoulette\\RouletteViewBetsController');
+    Route::resource('roulette-view-results', 'MultiPlayerRoulette\\RouletteViewResultsController');
+    Route::resource('sicbo-settings', 'MultiPlayerSicbo\\SicboSettingsController');
+    Route::resource('sicbo-view-bets', 'MultiPlayerSicbo\\SicboViewBetsController');
+    Route::resource('sicbo-view-results', 'MultiPlayerSicbo\\SicboViewResultsController');
+    Route::resource('balance-adjustment', 'Reports\\BalanceAdjustmentController');
+    Route::resource('change-notification', 'Reports\\ChangeNotificationController');
+    Route::resource('dormant-account', 'Reports\\DormantAccountController');
+    Route::resource('performance-payout', 'Reports\\PerformancePayoutController');
+    Route::resource('performance-report', 'Reports\\PerformanceReportController');
+    Route::resource('revenue-report', 'Reports\\RevenueReportController');
+    Route::resource('account-exclusions-report', 'Reports\\AccountExclusionsReportController');
+    Route::resource('account-lock', 'Reports\\AccountLockController');
+    Route::resource('player-deactivations', 'Reports\\PlayerDeactivationsController');
+    Route::resource('player-sessions', 'Reports\\PlayerSessionsController');
+    Route::resource('jackpot-config', 'Reports\\JackpotConfigController');
+    Route::resource('jackpot-wons', 'Reports\\JackpotWonsController');
+    Route::resource('account-summary', 'Reports\\AccountSummaryController');
+    Route::resource('significant-event', 'Reports\\SignificantEventController');
+    Route::resource('event-reports', 'Reports\\EventReportsController');
+    Route::resource('taxed-game-plays', 'Reports\\TaxedGamePlaysController');
+
+    Route::resource('blacklist-add', 'Security\\BlacklistAddController');
+    
+    Route::get('black-list', 'Security\\BlackListController@index')->name('black-list.index');
+    Route::get('black-list-block/{id}', 'Security\\BlackListController@block')->name('black-list.block');
+
+
+    Route::resource('ban-ip', 'Security\\BanIPController');
+    Route::resource('banedip-list', 'Security\\BanedipListController');
+    Route::resource('configure-feed', 'SportsBook\\ConfigureFeedController');
+    Route::resource('configure-leagues', 'SportsBook\\ConfigureLeaguesController');
+    Route::resource('maintenance', 'SportsBook\\MaintenanceController');
+    Route::resource('reevaluate-tickets', 'SportsBook\\ReevaluateTicketsController');
+    Route::resource('sports-settings', 'SportsBook\\SportsSettingsController');
+    Route::resource('sports-view-events', 'SportsBook\\SportsViewEventsController');
+    Route::resource('sports-view-tickets', 'SportsBook\\SportsViewTicketsController');
+
+    Route::get('create-agent', 'StaffManagement\\CreateAgentController@index')->name('create-agent.index');
+    Route::post('create-agent', 'StaffManagement\\CreateAgentController@store')->name('create-agent.store');
+    Route::get('agent-list', 'StaffManagement\\CreateAgentController@show')->name('create-agent.list');
+    Route::get('agent-logs', 'StaffManagement\\CreateAgentController@logs')->name('create-agent.logs');
+
+    Route::get('create-operator', 'StaffManagement\\CreateOperatorController@index')->name('create-operator.index');
+    Route::post('create-operator', 'StaffManagement\\CreateOperatorController@store')->name('create-operator.store');
+    Route::get('operator-list', 'StaffManagement\\CreateOperatorController@show')->name('create-operator.list');
+    Route::get('operator-logs', 'StaffManagement\\CreateOperatorController@logs')->name('create-operator.logs');
+
+    // Route::resource('create-operator', 'StaffManagement\\CreateOperatorController');
+    Route::resource('list-agents', 'StaffManagement\\ListAgentsController');
+    Route::resource('list-operator', 'StaffManagement\\ListOperatorController');
+    Route::resource('login-history-staff', 'StaffManagement\\LoginHistoryStaffController');
+    Route::resource('search-staff', 'StaffManagement\\SearchStaffController');
+    Route::resource('transfer-funds-to-agents', 'StaffManagement\\TransferFundsToAgentsController');
+    Route::resource('casino-activity', 'Statistics\\CasinoActivityController');
+    Route::resource('game-volatility', 'Statistics\\GameVolatilityController');
+    Route::resource('overall-activity', 'Statistics\\OverallActivityController');
+    Route::resource('chart-profit', 'Statistics\\ChartProfitController');
+    Route::resource('deposits-withdrawals', 'Statistics\\DepositsWithdrawalsController');
+    Route::resource('signup-conversions', 'Statistics\\SignupConversionsController');
+    Route::resource('statistics-dashboard', 'Statistics\\StatisticsDashboardController');
+    Route::resource('conversion-rates', 'Statistics\\ConversionRatesController');
+    Route::resource('disabled-users', 'Statistics\\DisabledUsersController');
+    Route::resource('gameplay-statistics', 'Statistics\\GameplayStatisticsController');
+    Route::resource('create-users', 'UserManagement\\CreateUsersController');
+
+    Route::resource('list-users', 'UserManagement\\ListUsersController');
+    // user document Start
+    Route::get('user-documents', 'UserManagement\\ListUsersController@UserDocument')->name('admin.list_documents');
+    Route::get('user-documents-download/{id}', 'UserManagement\\ListUsersController@UserDocumentDownload')->name('admin.list_documents_download');
+    Route::post('user-documents-approve/{id}', 'UserManagement\\ListUsersController@UserDocumentApprove')->name('admin.UserDocumentApprove');
+    Route::post('user-documents-reject/{id}', 'UserManagement\\ListUsersController@UserDocumentReject')->name('admin.UserDocumentReject');
+    // user document end
+    Route::resource('loggedin-users', 'UserManagement\\LoggedinUsersController');
+    Route::resource('loggedin-history-users', 'UserManagement\\LoggedinHistoryUsersController');
+    Route::resource('list-messages', 'UserManagement\\ListMessagesController');
+    Route::resource('send-messages', 'UserManagement\\SendMessagesController');
+    Route::resource('multi-account', 'UserManagement\\MultiAccountController');
+    Route::resource('multiip-detector', 'UserManagement\\MultiipDetectorController');
+    Route::resource('list-support-tickets', 'Other\\ListSupportTicketsController');
+    Route::resource('list-misc-logs', 'Other\\ListMiscLogsController');
+    Route::resource('send-newsletter', 'Other\\SendNewsletterController');
+    Route::resource('system-event-add', 'Other\\SystemEventAddController');
+    Route::resource('system-event-list', 'Other\\SystemEventListController');
+    Route::resource('upload-site-map', 'Other\\UploadSiteMapController');
+    Route::resource('achievement-list', 'GamesManagement\\AchievementListController');
+    Route::resource('slots', 'GamesManagement\\SlotsController');
+    Route::resource('roulette', 'GamesManagement\\RouletteController');
+    Route::resource('craps', 'GamesManagement\\CrapsController');
+    Route::resource('keno', 'GamesManagement\\KenoController');
+    Route::resource('black-jack', 'GamesManagement\\BlackJackController');
+    Route::resource('baccarat', 'GamesManagement\\BaccaratController');
+    Route::resource('add-games', 'GamesManagement\\AddGamesController');                             
+    Route::post('order-game/{id}', 'GamesManagement\AddGamesController@GameOrder')->name('GameOrder');                             
+    Route::get('games-name/{id}', 'GamesManagement\\AddGamesController@single_game')->name('single_game');
+    Route::get('games-icon-edit/{id}/{ex}/{game}', 'GamesManagement\\AddGamesController@game_icon_edit')->name('game_icon_edit');
+    Route::post('games-icon-update/', 'GamesManagement\\AddGamesController@game_icon_update')->name('game_icon_update');
+
+    Route::post('get-city', 'UserManagement\\CreateUsersController@get_city')->name('get_city');
+    Route::post('status-change/{id}', 'UserManagement\\ListUsersController@status_change')->name('admin.status_change');
+    Route::delete('delete-user/{id}', 'UserManagement\\ListUsersController@delete')->name('admin.delete_user');
+  //system toekn
+    Route::get('system-token','Admin\AdminController@admin_token')->name('admin_token');
+    Route::post('system-token-store','Admin\AdminController@Token_store')->name('admin_token_store');
+    Route::get('system-token-edit/{id}','Admin\AdminController@Token_edit')->name('Token_edit');
+    Route::post('system-token-update','Admin\AdminController@Token_update')->name('admin_token_update');
+  //system Spin
+    Route::get('system-spin','Admin\AdminController@admin_spin')->name('admin_spin');
+    Route::post('system-spin-store','Admin\AdminController@spin_store')->name('admin_spin_store');
+    Route::get('system-spin-edit/{id}','Admin\AdminController@spin_edit')->name('spin_edit');
+    Route::post('system-spin-update/{id}','Admin\AdminController@spin_update')->name('admin_spin_update');
+    Route::get('system-spin-change/{id}','Admin\AdminController@spin_change')->name('spin_change');
+  //Pley6 currency conversation
+    Route::get('system-pleysix-token','Admin\AdminController@currencyConversaton')->name('currencyConversaton');
+    Route::post('system-pleysix-token-store','Admin\AdminController@currencyConversaton_store')->name('currencyConversaton_store');
+    Route::get('system-pleysix-token-edit/{id}','Admin\AdminController@currencyConversaton_edit')->name('currencyConversaton_edit');
+    Route::post('system-pleysix-token-update/{id}','Admin\AdminController@currencyConversaton_update')->name('currencyConversaton_update');
+
+    // system setting
+    Route::get('system-settings','Admin\AdminController@system_settings')->name('system_settings');
+});
+
+Route::get('/home', 'HomeController@index')->name('home');

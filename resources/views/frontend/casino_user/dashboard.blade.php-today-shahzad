@@ -1,0 +1,1778 @@
+@extends('frontend.casino_user.app')
+@push('css')
+  <style>
+     label.error{
+    color: red;
+    font-style: italic;
+    font-size: 14px;
+    font-weight: 200;
+    font-family: sans-serif;
+     }
+     label#file-error{
+        position: absolute;
+        margin-top: 49px;
+     }
+     .bubble {
+        border-radius: 100%;
+        font-size : small;
+        height: 28px;
+        width: 28px;
+        background-color: rgba(226, 32, 91, 0.77);
+        color: #ffffff;
+        text-align: top;
+        /* position: relative; */
+        top: 0px !important;;
+        float: right;
+        /* right: -3px; */
+        }
+        .form-control:disabled, .form-control[readonly] {
+            background-color: #e9ecef00;
+            opacity: 1;
+            color: #ded4d4;
+        }
+
+        /* HIDE RADIO */
+        [type=radio] { 
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        }
+
+        /* IMAGE STYLES */
+        [type=radio] + img {
+        cursor: pointer;
+        }
+
+        /* CHECKED STYLES */
+        [type=radio]:checked + img {
+        outline: 2px solid #f00;
+        }
+  </style>
+@endpush
+@section('content')
+<div class="all-wrapper section-gap section-gap-top-big">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="myaccount-container">
+                    <div class="row">
+                        @php          
+                        $tok = DB::table('token_currencies')->where(['status'=>1,'doller'=>1])->first();    
+                            $earn = DB::table('game_earnings')->where('user_id',Auth::user()->id)->sum('token');
+                            $userWallet = \App\ProsixUserWallet::where('user_id',Auth::user()->id)->first();
+                            $spin = DB::table('game_earnings')->where('user_id',Auth::user()->id)->sum('spin');
+                            
+                            $l_set = \App\LoyalitySettings::first();
+                            if (!is_null($l_set)) {
+                               $percen = $l_set->rate;
+                            }else {
+                                $percen = 1;
+                            }
+                            $amount = $earn;/*  round(intval(@$earn)  * ($percen/100)) ; */
+                            $amount = $userWallet->earn_loyalty;
+                            $earn = $userWallet->earn_loyalty;                                          
+                           // $spin = DB::table('game_earnings')->where('user_id',Auth::user()->id)->sum('spin');
+                            $loyalty_badge = DB::table('loyalities')->where('from_range','<=',$earn)->where('to_range','>=',$earn)->orderBy('id','desc')->first();
+                            $shopList = DB::table('add_shops')->where('loyalty_type',$loyalty_badge->id)->get();
+                            $userMissionsCom = \App\UserMission::where('user_id',Auth::user()->id)->where('status', '1')->pluck('mission_id')->toArray();
+                            $userMissionsPending = \App\UserMission::where('user_id',Auth::user()->id)->where('status', '0')->pluck('mission_id')->toArray();
+                            $not = DB::table('notifications')->where('user_id',Auth::user()->id);
+                            $read = DB::table('leave_notes')->where('user_id',Auth::user()->id);
+                            $unReadMsgCount = DB::table('leave_notes')->where('user_id',Auth::user()->id)->where('status' , '0')->count();
+                            
+                        @endphp
+                        <div class="col-xl-8">
+                            <div class="myaccount-imagebox-container">
+                                <div class="myaccount-imagebox">
+                                    <img src="{{@Auth::user()->profile->base_image?url(Auth::user()->profile->base_image):asset('assets/casino_user/images/avater.png')}}" alt="pic" class="img-fluid">
+                                </div>
+                                <div class="myaccount-imagebox-text" style="text-align: right;">
+                                    <p class="just-grd"><b>{{ @Auth::user()->user_name }}</b></p>
+                                    <p>USD : <b class="just-grd">{{ @myWallet()->usd ? myWallet()->usd : 0}}</b></p>
+                                    <p>TOTAL TOKENS : <b class="just-grd">{{ @myAccount() ? @myAccount() : 0}}</b></p>
+                                    <p>BONUS TOKENS : <b class="just-grd">{{ @myWallet()->free_token ? @myWallet()->free_token : 0}}</b></p>
+                                    
+                                </div>
+                                <div class="myaccount-imagebox-text" style="text-align: right; margin-left: 50px;" >
+                                    <p>VIP Points : <b class="just-grd">{{ isset($earn) ? $earn :0 }}</b></p>
+                                    <p>PLAY6 TOKENS : <b class="just-grd">{{ @myWallet()->token ? @myWallet()->token : 0}}</b></p>
+                                    <p>FREE SPIN : <b class="just-grd">{{ @myWallet()->free_spin ? @myWallet()->free_spin : 0}}</b></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="myaccount-tab-main">
+                        <div class="row">
+                            <div class="col-xl-4">
+                                <div class="tab">
+                                    <button class="tablinks my-ml" onclick="openCity(event, 'Mission')" id="defaultOpen">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon1.png" alt="pic" class="img-fluid">
+                                        <p>Missions</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Banking')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon8.png" alt="pic" class="img-fluid">
+                                        <p>Banking</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Loyalty')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon2.png" alt="pic" class="img-fluid">
+                                        <p>Loyalty</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Bonus')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon3.png" alt="pic" class="img-fluid">
+                                        <p>Bonus</p>
+                                    </button>
+                                    <button class="tablinks my-ml" onclick="openCity(event, 'Favorites')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon4.png" alt="pic" class="img-fluid">
+                                        <p>Favorites</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Settings')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon6.png" alt="pic" class="img-fluid">
+                                        <p>Settings</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Inbox')">
+                                    @if($unReadMsgCount)
+                                    <span class="bubble" >{{ $unReadMsgCount }} </span>
+                                    @endif
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon5.png" alt="pic" class="img-fluid"> </img>
+                                        <p>Inbox  </p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'VipShop')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon9.png" alt="pic" class="img-fluid">
+                                        <p>Vip Shop</p>
+                                    </button>
+                                    <!-- <button class="tablinks" onclick="openCity(event, 'Wallet')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon10.png" alt="pic" class="img-fluid">
+                                        <p>Wallet</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'History')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon7.png" alt="pic" class="img-fluid">
+                                        <p>History</p>
+                                    </button> -->
+                                    
+                                    <div class="clr"></div>
+                                </div>
+                            </div>
+                            <div class="col-xl-8">
+                                <div id="Mission" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        
+                                                        <div class="common-text-container">
+                                                            @if ($missions->count())
+                                                            @foreach ($missions as $item)
+                                                            <div class="common-text-box">
+                                                                <div class="row">
+                                                                    <div class="col-lg-2">
+                                                                        <div class="agriment-check">
+                                                                            <label for="checkbox" class="checkbox_label">
+                                                                                {{-- <input type="checkbox" class="checkbox_input" id="checkbox" name="check"> --}}
+                                                                                <img src="{{ isset($item->base_image) ? asset($item->base_image) : asset('assets/casino_user/images/mission-icon.png')}}" alt="pic" class="img-fluid">
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-10">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">{{ @$item->name }}</h4>
+                                                                            <p>Spin any slot Game for {{ isset($item->total_spin) ?  $item->total_spin.'  ': 0}} times </p>
+                                                                            <a href="javascript:;" onclick="PopUp(`{{ @$item->text }}`);">terms and condition apply</a>
+                                                                            @if(in_array($item->id , $userMissionsPending))
+                                                                                @php $um =  \App\UserMission::where('mission_id' ,$item->id )->where('user_id' ,Auth::user()->id)->first();  @endphp
+                                                                                <p>Mission Progress :  <b>{{  $um->spending  }} / {{  $item->total_spin }} </b></p>
+                                                                            @endif    
+                                                                            @if(in_array($item->id , $userMissionsCom))
+                                                                             <a href="javascript:;"  class="btn">Completed</a>
+                                                                              @elseif(in_array($item->id , $userMissionsPending)) <a href="javascript:;"  class="btn">In Progress</a> 
+                                                                            @else
+                                                                               <a class="btn child{{@$item->id}}" href="javascript:;" onclick="PlayMission({{@$item->id}})">Start Mission</a>
+                                                                            @endif
+                                                                            
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            @endforeach 
+                                                            @else
+                                                            <div class="common-text-box">
+                                                                <div class="row" style="coloer: white;" >
+                                                                <p style="text-align: center;padding-left: 20px;" >NO Latest Mission Found</p>
+                                                                </div>
+                                                            </div>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="Loyalty" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <div class="row">
+                                                            
+                                                            <div class="col-xl-12 m-auto">
+                                                                <div class="tab-loyalty-box">
+                                                                    <div class="para-box">
+                                                                        <h4 class="just-grd">LOYALTY PROGRESS</h4>
+                                                                        <p>your current status : <b class="just-grd">{{ @$loyalty_badge->name}}</b></p>
+                                                                    </div>
+                                                                    <div class="para-box pb-0">
+                                                                        <h4 class="just-grd">CURRENT STEP PROGRESS</h4>
+                                                                    </div>
+                                                      
+                                                                    <div class="tab-loader">
+                                                                        <div class="ldBar label-center" data-value="{{ isset($loyalty_badge) ? abs(round(($amount / $loyalty_badge->to_range) * 100)): 0}}" data-type="stroke" data-stroke="data:ldbar/res,gradient(0,1,#ca6e05,#ffee97)" data-stroke-trail="rgba(255,255,255,0.33)" data-stroke-trail-width="14" data-preset="circle"></div>
+                                                                       <p>status points : <b class="just-grd">{{ isset($amount) ? $amount : 0 }}/{{ isset($loyalty_badge->to_range) ? $loyalty_badge->to_range : 0 }}</b></p>
+                                                                    </div>
+
+                                                                    <div class="para-box">
+                                                                        <p>status points needed to complete this step : <b class="just-grd"> {{ $loyalty_badge->to_range - $amount }} </b></p>
+                                                                    </div>
+                                                                    <div class="para-box">
+                                                                       
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <div class="row">
+                                                            
+                                                            <div class="col-xl-12 m-auto">
+                                                                <div class="tab-loyalty-box">
+                                                                    <div class="para-box">
+                                                                        <h4 class="just-grd">Convert Loyalty Tokens</h4>
+                                                                        <p>your current status : <b class="just-grd">{{ @$loyalty_badge->name}}</b></p>
+                                                                        <form action="{{ route('user.convert_loyalty')}}" method="POST" id="loyaty-form">
+                                                                            @csrf
+                                                                            <input type="hidden" name="tier" value="{{ $loyalty_badge->id  }}">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-6 ml-lg-auto" style="margin-right: auto!important;" >
+                                                                                    <input type="text" class="form-control" name="lt"   placeholder="Loyalty Tokens">
+                                                                                </div>
+                                                                                <div class="col-lg-4 ">
+                                                                                    <button type="submit" class="btn">Convert</button>
+                                                                                </div>
+                                                                            </div>
+                                                                            
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Bonus" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                            <!-- <li class="nav-item tab-item ml-0">
+                                                                <a class="nav-link btn tab-btn active" id="pills-bonus-status-tab" data-toggle="pill" href="#pills-bonus-status" role="tab" aria-controls="pills-bonus-status" aria-selected="true">Bonus Status</a>
+                                                            </li> -->
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn active" id="pills-apply_code-tab" data-toggle="pill" href="#pills-apply_code" role="tab" aria-controls="pills-apply_code" aria-selected="false">Apply Code</a>
+                                                            </li>
+                                                        </ul>
+                                                        <div class="tab-content" id="pills-tabContent">
+                                                             
+                                    
+                                                            <div class="tab-pane fade show active " id="pills-apply_code" role="tabpanel" aria-labelledby="pills-apply_code-tab">
+                                                                <div class="user-info-part">
+                                                                    <form  id="Bonus_form" method="POST">
+                                                                        @csrf
+                                                                        <div class="row">
+                                                                            {{-- <div class="col-lg-9 m-auto">
+                                                                                <select name="" class="select-input form-control minimal">
+                                                                                    <option value="usd">Bonus Type</option>
+                                                                                    <option value="usd">ABC</option>
+                                                                                    <option value="eur">ABC</option>
+                                                                                </select>
+                                                                            </div> --}}
+                                                                            <div class="col-lg-9 m-auto">
+                                                                                <input name="bonus_code" type="text" class="form-control" placeholder="Bonus Code" id="bonus_code">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" id="Bonus_submit" class="btn">Apply</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Favorites" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <p class="subtitle just-grd">My Favorite Games</p>
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <div class="common-text-container">
+                                                            <div class="common-text-box">
+                                                                <div class="row">
+                                                                    @if (@$user->favorite_game->count() > 0)                                                                        
+                                                                    @foreach (@$user->favorite_game as $item)                                                                        
+                                                                        <div class="col-md-4 fav_ga{{ @$item->game->id }}">
+                                                                            <div class="favorite-img-box">
+                                                                                <img src="{{ asset('games-banner').'/'.@$item->game->base_image }}" alt="piv">
+                                                                                <div class="overlay">
+                                                                                    <div class="overlay-text">
+                                                                                        @if (@$item->game->game_type == 2)
+                                                                                            <a href="{{ route('demo_play_game', strtolower( str_replace(' ', '-',@$item->game->game_title)) ) }}"  class="btn">Play Demo</a>
+                                                                                            <a href="{{ route('play_game', strtolower( str_replace(' ', '-',@$item->game->game_title)) ) }}"  class="btn">Play Real</a>
+                                                                                            @elseif(@$item->game->game_type == 3)  
+                                                                                            <a href="{{ route('play_game', strtolower( str_replace(' ', '-',@$item->game->game_title)) ) }}"  class="btn">Play Real</a>
+                                                                                            @else
+                                                                                            <a href="{{ route('demo_play_game', strtolower( str_replace(' ', '-',@$item->game->game_title)) ) }}"  class="btn">Play Demo</a>
+                                                                                            @endif
+                                                                                        <p>{{ @$item->game->game_title }}</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <a onclick="Favorite({{ @$item->game->id }})" class="icon-btn"><i class="fas fa-times text-danger"></i></a>
+                                                                            </div>
+                                                                        </div>
+                                                                        @endforeach
+                                                                        @else
+                                                                        <p class="pl-3">No games in favorite</p>
+                                                                        @endif
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Inbox" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                            <li class="nav-item tab-item ml-0">
+                                                                <a class="nav-link btn tab-btn active" id="pills-inbox-tab" data-toggle="pill" href="#pills-inbox" role="tab" aria-controls="pills-home" aria-selected="true">Support Messages</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-read-tab" data-toggle="pill" href="#pills-read" role="tab" aria-controls="pills-profile" aria-selected="false">System Log</a>
+                                                            </li>
+                                                            
+                                                        </ul>
+                                                        <div class="tab-content" id="pills-tabContent">
+                                                            <div class="tab-pane fade show active" id="pills-inbox" role="tabpanel" aria-labelledby="pills-inbox-tab">
+                                                                @php
+                                                                    
+                                                                    $Unread = DB::table('notifications')->where('user_id',Auth::user()->id)->where('status',1);
+                                                                    if (isset($read)) {                                                                        
+                                                                        $readCount =$read->count();
+                                                                    }else {
+                                                                        $readCount = 0;
+                                                                    }
+                                                                    if (isset($Unread)) {                                                                        
+                                                                        $UnreadCount =$Unread->count();
+                                                                    }else {
+                                                                        $UnreadCount = 0;
+                                                                    }
+                                                                    if (isset($not)) {                                                                        
+                                                                        $notCount =$not->count();
+                                                                    }else {
+                                                                        $notCount = 0;
+                                                                    }
+                                                                    $reads =$read->orderBy('created_at','desc')->limit(80)->get();
+                                                                    $Unreads =$Unread->orderBy('created_at','desc')->get();
+                                                                    $notifications =$not->orderBy('created_at','desc')->limit(80)->get();
+                                                                @endphp
+                                                                <div class="info-icon-wrap text-right">
+                                                                   <!-- <a href="javascript:;" class="info-icon"><i class="fas fa-envelope"></i> <span class="AllIn" id="allNot">{{ $readCount }}</span></a>
+                                                                    <a href="javascript:;"  onclick="DeleteMsg(1)" id="deleteMeg" class="info-icon"><i class="fas fa-folder-minus text-danger"></i></a> -->
+                                                                </div>
+                                                                <div class="common-text-container">
+                                                                    @foreach ( $reads  as $item)                                                                        
+                                                                    <div class="common-text-box {{ $item->status == 0 ? 'unread' :'' }}" id="allInbox{{ $item->id }}" onclick="ViewSms({{ $item->id }}, `{{ $item->body }}` , true);">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <!-- <input type="checkbox" value="{{ $item->id }}" name="inbox" class="checkbox_input" id="checkbox"> -->
+                                                                                        <span class="just-grd">SUPPORT</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                               <p class="badge badge-secondary"><i>{{ date('d/m/y', strtotime($item->created_at)) }}</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                               <p>{{ $item->body }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                                                    
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-read" role="tabpanel" aria-labelledby="pills-read-tab">
+                                                                <div class="info-icon-wrap text-right">
+                                                                    <!-- <a href="javascript:;" class="info-icon"><i class="fas fa-envelope-open-text"></i> <span id="readcount">{{ $UnreadCount }}</span></a>
+                                                                    <a href="javascript:;" onclick="DeleteMsg(2)" class="info-icon"><i class="fas fa-folder-minus text-danger"></i></a> -->
+                                                                </div>
+                                                                <div class="common-text-container">
+                                                                    @foreach ($notifications as $item)                                                                        
+                                                                    <div class="common-text-box" id="ReadInbox{{ $item->id }}" onclick="ViewSms({{ $item->id }}, `{{ $item->message }}` , false);" >
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <!-- <input type="checkbox" class="checkbox_input" value="{{ $item->id }}" id="checkbox" name="inbox"> -->
+                                                                                        <span class="just-grd">SUPPORT</span> 
+                                                                                    </label>
+                                                                                </div>
+                                                                               <p class="badge badge-secondary"><i>{{ date('d/m/y', strtotime($item->created_at)) }}</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                               <p>{{ $item->message }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                                                    
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-unread" role="tabpanel" aria-labelledby="pills-unread-tab">
+                                                                <div class="info-icon-wrap text-right">
+                                                                    <!-- <a href="javascript:;" class="info-icon"><i class="fas fa-envelope"></i> <span class="AllIn" id="Unreadcounts">{{ $readCount }}</span></a>
+                                                                    <a href="javascript:;" onclick="DeleteMsg(3)" class="info-icon"><i class="fas fa-folder-minus text-danger"></i></a> -->
+                                                                </div>
+                                                                <div class="common-text-container">
+                                                                    @foreach ($reads as $item)                                                                        
+                                                                    <div class="common-text-box {{ $item->status == 0 ? 'unread' :'' }}" id="UnReadInbox{{ $item->id }}" onclick="ViewSms({{ $item->id }}, `{{ $item->body }}` , true);" >
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <!-- <input type="checkbox" value="{{ $item->id }}" class="checkbox_input" id="checkbox" name="inbox"> -->
+                                                                                        <span class="just-grd">SUPPORT</span> 
+                                                                                    </label>
+                                                                                </div>
+                                                                               <p class="badge badge-secondary"><i>{{ date('d/m/y', strtotime($item->created_at)) }}</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                               <p>{{ $item->body }}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>                                                                    
+                                                                    @endforeach
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Settings" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                            <li class="nav-item tab-item ml-0">
+                                                                <a class="nav-link btn tab-btn active" id="pills-general-tab" data-toggle="pill" href="#pills-general" role="tab" aria-controls="pills-home" aria-selected="true">General</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-Security-tab" data-toggle="pill" href="#pills-Security" role="tab" aria-controls="pills-profile" aria-selected="false">Security</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-Document-tab" data-toggle="pill" href="#pills-Document" role="tab" aria-controls="pills-contact" aria-selected="false">Document</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-avatar-tab" data-toggle="pill" href="#pills-avatar" role="tab" aria-controls="pills-avatar" aria-selected="false">Avatar</a>
+                                                            </li>
+                                                        </ul>
+                                                        <div class="tab-content" id="pills-tabContent">
+                                                            <div class="tab-pane fade show active" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab">
+                                                                <div class="user-info-part">
+                                                                    <div class="user-info-text">
+                                                                        
+                                                                    </div>
+                                                                    <!-- <img src="{{@Auth::user()->profile->base_image?url(Auth::user()->profile->base_image):asset('assets/casino_user/images/avater.png')}}" alt="pic" class="img-fluid"> -->
+                                                                    
+                                                                    <form id="profile_update" style="margin-top:30px;"  action="{{route('user.update',@Auth::user()->id)}}" method="post" enctype="multipart/form-data">
+                                                                        @csrf
+                                                                        <div class="row">
+                                                                            <div class="col-lg-5 ml-lg-auto">
+                                                                                <input type="text" class="form-control" name="first_name" value="{{@Auth::user()->profile->first_name}}" placeholder="First Name">
+                                                                            </div>
+                                                                            <div class="col-lg-5 mr-lg-auto">
+                                                                                <input type="text" class="form-control" name="last_name" value="{{@Auth::user()->profile->last_name}}" placeholder="Last Name">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="email" class="form-control" value="{{@Auth::user()->email}}" placeholder="Email Address">
+                                                                            </div>
+                                                                            <div class="col-lg-5 ml-lg-auto">
+                                                                                <input type="text" class="form-control" name="dob" id="datepicker" value="{{ date('m-d-Y' , strtotime(@Auth::user()->profile->date_of_birth)) }}" placeholder="Date of birth">
+                                                                            </div>
+                                                                            <div class="col-lg-5 mr-lg-auto">
+                                                                                <div class="input">
+                                                                                    <input type="hidden" id="hidden_phone_code" value="{{ $countryPhoneCode }}">
+                                                                                    <input type="text" id="phoneField11" name="phone" class="form-control" value="{{@Auth::user()->phone}}" placeholder="Phone No.">
+                                                                                    <div class="clearfix"></div>
+                                                                                    
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <select name="gender" class="select-input form-control minimal">
+                                                                                    <option value="">Select Gender</option>
+                                                                                    <option value="M" {{@Auth::user()->profile->gender == 'M' ? 'selected' :""}}>Male</option>
+                                                                                    <option value="F" {{@Auth::user()->profile->gender == 'F' ? 'selected' :""}}>Female</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            {{-- <div class="col-lg-5 mr-lg-auto">
+                                                                                <input type="text" class="form-control" name="phone"  value="{{@Auth::user()->phone}}" placeholder="Phone No.">
+                                                                            </div> --}}
+                                                                            @php
+                                                                                $countries = DB::table('countries')->orderBy('name', 'asc')->get();
+                                                                            @endphp
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <select class="select-input form-control minimal" name="country" id="" required>
+                                                                                    <option value="">Country</option>
+                                                                                    @foreach($countries as $item)
+                                                                                        <option  {{@Auth::user()->profile->Country->id == $item->id ? 'selected' :""}}  value="{{ $item->id }}">{{ $item->name }}</option>
+                                                                                    @endforeach
+                                                                             </select>
+                                                                            </div>
+                                                                            <div class="col-lg-5 ml-lg-auto">
+                                                                                <select class="select-input form-control minimal" name="state" id="" required>
+                                                                                    <option  value="{{@Auth::user()->profile->State->name}}">{{@Auth::user()->profile->State->name}}</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-lg-5 mr-lg-auto">
+                                                                                <input type="text" class="form-control" name="zipcode" value="{{@Auth::user()->profile->zipcode}}" placeholder="Zip Code">
+                                                                            </div>
+
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <textarea class="form-control" name="Address" placeholder="Address">{{@Auth::user()->profile->address}}</textarea>
+                                                                            </div>
+                                                                            <!-- <div class="col-lg-5 m-auto">
+                                                                                <div class="file-input form-control">
+                                                                                   <input type="file" name="image" value="{{ @Auth::user()->profile->base_image }}">
+                                                                                    <span onchange="ProPic(this)" class="button">Choose</span>
+                                                                                    <span class="label" data-js-label>Profile Picture</span>
+                                                                                </div>
+                                                                            </div> -->
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" class="btn">Update</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-Security" role="tabpanel" aria-labelledby="pills-Security-tab">
+                                                            <div class="container-box">
+                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                            <li class="nav-item tab-item ml-0">
+                                                                <a class="nav-link btn tab-btn active" id="pills-bonus-status-tab" data-toggle="pill" href="#pills-cp" role="tab" aria-controls="pills-bonus-status" aria-selected="true">Change Password</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-apply_code-tab" data-toggle="pill" href="#pills-sq" role="tab" aria-controls="pills-apply_code" aria-selected="false">Security Question</a>
+                                                            </li>
+                                                        </ul>
+                                                        <div class="tab-content" id="pills-tabContent">
+                                                            <div class="tab-pane fade show active" id="pills-cp" role="tabpanel" aria-labelledby="pills-bonus-status-tab">
+                                                            <form action="{{route('user.PasswordChange',@Auth::user()->id)}}" method="POST" id="password_change">
+                                                                        @csrf
+                                                                        <div class="row">
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="password" class="form-control" name="old_password" placeholder="Old Password">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="password" id="pass" class="form-control" name="password" placeholder="New Password">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="password" class="form-control" name="password_confirmation" placeholder="Confirm Password">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" class="btn">Update</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+                                                            </div>
+                                    
+                                                            <div class="tab-pane fade" id="pills-sq" role="tabpanel" aria-labelledby="pills-apply_code-tab">
+                                                                <div class="user-info-part">
+                                                                <form id="Security_user" action="{{route('user.Security',@Auth::user()->id)}}" method="POST">
+                                                                        @csrf
+                                                                        <div class="row">
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <select name="secret_question" class="select-input form-control minimal">
+                                                                                    <option value="0">Select Secturity Question</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is the hidden name of my mother?' ?'selected' :'' }} value="What is the hidden name of my mother?">What's my mother's hidden name?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is my favourite hobby?' ?'selected' :'' }} value="What is my favourite hobby?">What's my favourite hobby?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is my favourite sport club?' ?'selected' :'' }} value="What is my favourite sport club?">What's my favourite sport club?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is the name of my favourite book?' ?'selected' :'' }} value="What is the name of my favourite book?">What's the name of my favourite book?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'Who was my childhood hero?' ?'selected' :'' }} value="Who was my childhood hero?">Who was my childhood hero?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is the name of my pet?' ?'selected' :'' }} value="What is the name of my pet?">What's the name of my pet?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is my nickname?' ?'selected' :'' }} value="What is my nickname?">What's my nickname?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What was the make of my first car?' ?'selected' :'' }} value="What was the make of my first car?">What was the make of my first car?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is my secret code?' ?'selected' :'' }} value="What is my secret code?">What's my secret code?</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                               <input name="secret_answer" type="text" value="{{ @Auth::user()->profile->secret_answer }}" class="form-control" placeholder="Answer">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="password" name="password" class="form-control" placeholder="Password">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" class="btn">Update</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                                <div class="user-info-part">
+                                                                    <div class="user-info-text">
+                                                                        
+                                                                    </div>
+                                                                    
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-Document" role="tabpanel" aria-labelledby="pills-Document-tab">
+                                                                <div class="user-info-part">
+                                                                    <div class="user-info" style="color:white;" >
+                                                                        <p>Please provide a copy of your ID-Card OR Passport for identity verification and another document for address verification.</p>
+                                                                        <p>Maximum accepted file size is 10mb.The documents needs to clearly show your name, address and match the information provided in your account.</p>
+                                                                    </div>
+                                                                     <form action="{{ route('user.acc_document') }}" id="user_documents" method="POST" enctype="multipart/form-data">
+                                                                       @csrf
+                                                                        <h3>TYPE OF DOCUMENT</h3>
+                                                                        <div class="row">
+                                                                            <!-- <div class="col-lg-10 m-auto">
+                                                                                <select name="document_type" class="select-input form-control minimal">
+                                                                                    <option value="">Please Choose</option>
+                                                                                    <option value="id">ID Card / Document</option>
+                                                                                    <option value="pa">Passport</option>
+                                                                                    <option value="dr">Driving Licence</option>
+                                                                                    <option value="bs">Bank Statement</option>
+                                                                                </select>
+                                                                            </div> -->
+                                                                            <div class="col-lg-12 m-auto">
+                                                                                <div class=" col-lg-10 file-input form-control">
+                                                                                    <label class="col-lg-4" for="file">Proof Of Identity : </label>
+                                                                                    <input type="file" name="identity" required>
+                                                                                    <span class="button">Choose</span>
+                                                                                    <span class="label" data-js-label>Upload File</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-lg-12 m-auto">
+                                                                                <div class=" col-lg-10 file-input form-control">
+                                                                                    <label class="col-lg-4" for="file">Proof Of Address : </label>
+                                                                                    <input type="file" name="bank_statement" required>
+                                                                                    <span class="button">Choose</span>
+                                                                                    <span class="label" data-js-label>Upload File</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" class="btn">Submit</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+                                                                    <div class="table-container withdraw-table">
+                                                                        <table class="all-table table table-bordered table-striped table-hover table-dark mt-3">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <td colspan="8">All information</td>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                @php
+                                                                                    $user_document = DB::table('user_documents')->where('user_id',$user->id)->get();
+                                                                                @endphp
+                                                                                <tr>
+                                                                                    <td>date</td>
+                                                                                    <td>Type</td>
+                                                                                    <td>Status</td>
+                                                                                </tr>
+                                                                               @foreach ($user_document as $item)                                                                                  
+                                                                                <tr>
+                                                                                    <td>{{ date('Y-m-d',strtotime(@$item->created_at)) }}</td>
+                                                                                    <td>ID card / Bank Statement</td>
+                                                                                    @if (@$item->status == 1)
+                                                                                       <td><a href="javascript:void(0)" class="badge badge-info">Pending</a></td>
+                                                                                    @endif
+                                                                                    @if (@$item->status == 2)   
+                                                                                       <td><a href="javascript:void(0)" class="badge badge-success">Accepted</a></td>
+                                                                                    @endif
+                                                                                    @if (@$item->status == 3)   
+                                                                                       <td><a href="javascript:void(0)" class="badge badge-warning">Decline</a></td>
+                                                                                    @endif
+                                                                                </tr>
+                                                                               @endforeach
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-avatar" role="tabpanel" aria-labelledby="pills-avatar-tab">
+                                                                <div class="user-info-part">
+                                                                    <div class="user-info-text">
+                                                                        <p>choose avatar</p>
+                                                                    </div>
+                                                                    <div class="sub-tabcontainer">
+                                                                        <div class="row">
+                                                                            <div class="col-xl-12">
+                                                                                <div class="container-box-main">
+                                                                                    <div class="container-box">
+                                                                                    <form action="{{route('user.update_avatar',@Auth::user()->id)}}" method="post" enctype="multipart/form-data">
+                                                                                        @csrf();
+                                                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                                                            <li class="nav-item tab-item  tab-item-sub ml-0">
+                                                                                                <a class="nav-link btn tab-btn active" id="pills-custom-av-tab" data-toggle="pill" href="#pills-custom-av" role="tab" aria-controls="pills-custom-av" aria-selected="true">Custom avatar</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item tab-item tab-item-sub">
+                                                                                                <a class="nav-link btn tab-btn" id="pills-nwe-av-tab" data-toggle="pill" href="#pills-nwe-av" role="tab" aria-controls="pills-nwe-av" aria-selected="false">New avatar</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item tab-item tab-item-sub">
+                                                                                                <a class="nav-link btn tab-btn" id="pills-casino-good-tab" data-toggle="pill" href="#pills-casino-good" role="tab" aria-controls="pills-casino-good" aria-selected="false">casino goods</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item tab-item tab-item-sub">
+                                                                                                <a class="nav-link btn tab-btn" id="pills-coustome-tab" data-toggle="pill" href="#pills-coustome" role="tab" aria-controls="pills-coustome" aria-selected="false">Costumes</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item tab-item tab-item-sub">
+                                                                                                <a class="nav-link btn tab-btn" id="pills-male-av-tab" data-toggle="pill" href="#pills-male-av" role="tab" aria-controls="pills-male-av" aria-selected="false">male</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item tab-item tab-item-sub">
+                                                                                                <a class="nav-link btn tab-btn" id="pills-n-av-tab" data-toggle="pill" href="#pills-n-av" role="tab" aria-controls="pills-n-av" aria-selected="false">N</a>
+                                                                                            </li>
+                                                                                            <li class="nav-item tab-item tab-item-sub">
+                                                                                                <a class="nav-link btn tab-btn" id="pills-tils-av-tab" data-toggle="pill" href="#pills-tils-av" role="tab" aria-controls="pills-tils-av" aria-selected="false">Tilesman</a>
+                                                                                            </li>
+                                                                                        </ul>
+                                                                                        <div class="tab-content" id="pills-tabContent">
+                                                                                            <div class="tab-pane fade show active" id="pills-custom-av" role="tabpanel" aria-labelledby="pills-custom-av-tab">
+                                                                                                <div class="avatar-main">
+                                                                                                    <div class="preview img-wrapper">
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/avater.png" alt="pic" class="img-fluid">
+                                                                                                    </div>
+                                                                                                    <div class="file-upload-wrapper">
+                                                                                                        
+                                                                                                            <input type="file" name="avatar_upload" class="file-upload-native" accept="image/*" />
+                                                                                                            <input type="text"  placeholder="upload image" class="file-upload-text" />
+                                                                                                       
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="tab-pane fade" id="pills-nwe-av" role="tabpanel" aria-labelledby="pills-nwe-av-tab">
+                                                                                                <div class="avatar-main">
+                                                                                                    <div class="avatar-main-pic-box">
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an1.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an3.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an3.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an4.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an4.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an2.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an2.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an5.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an5.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an6.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an6.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an7.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an7.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an8.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an8.png">
+                                                                                                    </label>
+                                                                                                        <!-- <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an1.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an2.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an3.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an4.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an5.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an6.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an7.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an8.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an9.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an10.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an11.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/AvatarNew/an12.png" alt="pic"></a> -->
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="tab-pane fade" id="pills-casino-good" role="tabpanel" aria-labelledby="pills-casino-good-tab">
+                                                                                                <div class="avatar-main">
+                                                                                                    <div class="avatar-main-pic-box">
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/CasinoGoods/cg1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg1.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/CasinoGoods/cg2.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg2.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/CasinoGoods/cg3.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg3.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/CasinoGoods/cg4.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg4.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/CasinoGoods/cg5.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg5.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/CasinoGoods/cg6.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg6.png">
+                                                                                                    </label>
+                                                                                                        <!-- <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg1.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg2.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg3.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg3.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg4.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg5.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg6.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/CasinoGoods/cg7.png" alt="pic"></a> -->
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="tab-pane fade" id="pills-coustome" role="tabpanel" aria-labelledby="pills-coustome-tab">
+                                                                                                <div class="avatar-main">
+                                                                                                    <div class="avatar-main-pic-box">
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/costumes/costumes1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes1.png">
+                                                                                                    </label>
+                                                                                                    <label> 
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/costumes/costumes2.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes2.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes3.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes4.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes5.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/AvatarNew/an1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes6.png">
+                                                                                                    </label>
+                                                                                                        <!-- <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes1.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes2.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes3.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes4.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes5.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes6.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes7.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes8.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes9.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/costumes/costumes10.png" alt="pic"></a> -->
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="tab-pane fade" id="pills-male-av" role="tabpanel" aria-labelledby="pills-male-av-tab">
+                                                                                                <div class="avatar-main">
+                                                                                                    <div class="avatar-main-pic-box">
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/male/male1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/male/male1.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/male/male2.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/male/male2.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/male/male3.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/male/male3.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/male/male4.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/male/male4.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/male/male5.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/male/male5.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/male/male6.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/male/male6.png">
+                                                                                                    </label>
+                                                                                                        <!-- <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male1.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male2.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male3.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male4.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male5.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male6.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male7.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male8.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male9.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male10.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male11.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/male/male12.png" alt="pic"></a> -->
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+
+                                                                                            <div class="tab-pane fade" id="pills-n-av" role="tabpanel" aria-labelledby="pills-n-av-tab">
+                                                                                                <div class="avatar-main">
+                                                                                                    <div class="avatar-main-pic-box">
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/n/n1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/n/n1.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/n/n2.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/n/n2.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/n/n3.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/n/n3.png">
+                                                                                                    </label>
+                                                                                                        <!-- <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n1.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n2.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n3.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n4.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n5.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n6.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n7.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n8.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n9.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n10.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n11.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n12.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n13.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n14.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n15.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n16.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n17.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n18.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n19.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n20.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n21.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n22.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n23.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n24.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n25.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/n/n26.png" alt="pic"></a> -->
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                            <div class="tab-pane fade" id="pills-tils-av" role="tabpanel" aria-labelledby="pills-tils-av-tab">
+                                                                                                <div class="avatar-main">
+                                                                                                    <div class="avatar-main-pic-box">
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/tilesman/tilesman1.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/tilesman/tilesman1.png">
+                                                                                                    </label>
+                                                                                                    <label>
+                                                                                                        <input type="radio" name="avatar_test" value="assets/casino_user/images/tilesman/tilesman2.png" >
+                                                                                                        <img src="{{ asset('assets/casino_user/')}}/images/tilesman/tilesman2.png">
+                                                                                                    </label>
+                                                                                                        <!-- <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/tilesman/tilesman1.png" alt="pic"></a>
+                                                                                                        <a href="#"><img src="{{ asset('assets/casino_user/')}}/images/tilesman/tilesman2.png" alt="pic"></a> -->
+                                                                                                    </div>
+                                                                                                </div>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                            <button type="submit" class="btn " value="submit"> Update Avatar  </button>
+                                                                                        </form>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="History" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="para-box">
+                                            <h4 class="just-grd">Feature Coming Soon!</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="Wallet" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">                                                        
+                                                        <div class="common-text-container">
+                                                            <div class="card common-text-box text-center">
+                                                                <h3 class="text-center just-grd">Wallet</h3> <hr>
+                                                                <div class="row mt-5">
+                                                                    
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">USD  :</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">{{ @myWallet()->usd ? myWallet()->usd : 0}}</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-5">
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">Token  :</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">{{ @myWallet()->token ? @myWallet()->token : 0 }}</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row mt-5">
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">Free Token   :</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-6">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">{{ @myWallet()->free_token ? @myWallet()->free_token : 0 }}</h4>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-xl-12 mt-5">
+                                                                        <div class="currency-convert">
+                                                                            <h2 class="just-grd">Buy Token</h2>
+                                                                                <div class="row">
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group mb-2">
+                                                                                            <input type="number" name="amount" class="form-control" id="buy_amount" min="0" />
+                                                                                            <label id="token_buy_errors" class="error" for="file"></label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <select class="select-input form-control minimal" id="currency-1" required>
+                                                                                                <option>USD</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-12 text-center">
+                                                                                        <button class="btn calculate-btn btn-primary mb-2"  id="buy_amount_token">Buy</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            <div class="result">
+                                                                                <p>
+                                                                                    <span class="just-grd" id="buy_token_result"></span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                                <div id="Banking" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                            <li class="nav-item tab-item ml-0">
+                                                                <a class="nav-link btn tab-btn active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Deposit</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Withdraw</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Transaction History</a>
+                                                            </li>
+                                                            <!-- <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-calculator-tab" data-toggle="pill" href="#pills-calculator" role="tab" aria-controls="pills-calculator" aria-selected="false">Convert Currency</a>
+                                                            </li> -->
+                                                        </ul>
+                                                        <div class="tab-content" id="pills-tabContent">
+                                                            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                                                                <div class="deposite-main">
+                                                                    <div class="deposite-hreader">
+                                                                        <p>Choose one of the methods below to make your deposit!</p>
+                                                                    </div>
+                                                                    <div class="deposite-brand">
+                                                                        <div class="row">
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/marter-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/visa-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/net-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/skrill-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="deposite-form">
+                                                                        <form action="{{ route('paymentDeposit')}}" method="POST" id="payment-form">
+                                                                            @csrf
+                                                                            <h3>Personal Information</h3>
+                                                                            <input type="hidden" id="hidden_PlaySix_token" value="{{ $tok->pley6_token }}" >
+                                                                            <div class="row">
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" name="first_name" value="{{@Auth::user()->profile->first_name}}" placeholder="First Name" >
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" name="last_name" value="{{@Auth::user()->profile->last_name}}" class="form-control" placeholder="Last Name">
+                                                                                </div>
+                                                                                @php
+                                                                                    $countries = DB::table('countries')->orderBy('name', 'asc')->get();
+                                                                                @endphp
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <select name="country" class="select-input form-control minimal">
+                                                                                        <option value="">Country</option>
+                                                                                        @foreach($countries as $item)
+                                                                                            <option  {{@Auth::user()->profile->Country->id == $item->id ? 'selected' :""}}  value="{{ $item->id }}">{{ $item->name }}</option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <select name="state" class="select-input form-control minimal">
+                                                                                        <option value="">Select State</option>
+                                                                                        <option selected  value="{{@Auth::user()->profile->State->name}}">{{@Auth::user()->profile->State->name}}</option>
+
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" name="zipcode" value="{{@Auth::user()->profile->zipcode}}" class="form-control" placeholder="Zip Code">
+                                                                                </div>
+                                                                                
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <textarea class="form-control" name="Address"  placeholder="Address">{{@Auth::user()->profile->address}}</textarea>
+                                                                                </div>
+                                                                            </div>
+                                                                            <h3>Card Information</h3>
+                                                                            <div class="row">
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <input type="eamil" class="form-control" name="email" value="{{@Auth::user()->email}}" placeholder="Email Address">
+                                                                                </div>
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <select name="" class="select-input form-control minimal">
+                                                                                        <option value="usd">USD</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <div class="row">
+                                                                                        <div class="col-lg-6">
+                                                                                            <input type="text" id="deposite_usd" class="form-control" name="amount" placeholder="Amount">
+                                                                                        </div>
+                                                                                        <div class="col-lg-6">
+                                                                                            <input type="text" class="form-control" id="PlaySix_token" name="PlaySix_token" readonly placeholder="PLay6 Token">
+                                                                                        </div>
+                                                                                    
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" class="form-control" name="bonus_code" placeholder="Bonus Code">
+                                                                                </div>
+                                                                                
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    
+                                                                                      <div id="card-element">
+                                                                                      </div>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <div id="card-exp">
+                                                                                    </div>                                                                                    
+                                                                                    
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <div id="card-cvc">
+                                                                                    </div>                                                                                    
+                                                                                    
+                                                                                </div>                                                                               
+                                                                                <div class="col-lg-10 m-auto text-center">
+                                                                                    <label class="error" id="card-errors" role="alert"></label>
+                                                                                </div> 
+                                                                                <div class="col-lg-10 m-auto text-center">
+                                                                                    {{-- <p><b>EUR 100</b> will be debited from your payment method</p> --}}
+                                                                                    <button type="submit" class="btn">DEPOSIT</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                                                                <div class="deposite-main">
+                                                                    <h3 class="text-center just-grd">Withdrawal Methods</h3>
+                                                                    <div class="deposite-brand">
+                                                                        <div class="row">
+                                                                            <!-- <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/marter-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/visa-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div> -->
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/net-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/skrill-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="deposite-form">
+                                                                       <form action="{{ route('paymentWithdraw') }}" method="POST" id="w_from_m">
+                                                                            @csrf
+                                                                            
+                                                                            <div class="row" style="display: none;">
+                                                                            <h3>Personal Information</h3>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" name="first_name" value="{{@Auth::user()->profile->first_name}}" placeholder="First Name" >
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" name="last_name" value="{{@Auth::user()->profile->last_name}}" class="form-control" placeholder="Last Name">
+                                                                                </div>
+                                                                                @php
+                                                                                    $countries = DB::table('countries')->orderBy('name', 'asc')->get();
+                                                                                @endphp
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <select name="w_country" class="select-input form-control minimal">
+                                                                                        <option value="">Country</option>
+                                                                                        @foreach($countries as $item)
+                                                                                            <option  {{@Auth::user()->profile->Country->id == $item->id ? 'selected' :""}}  value="{{ $item->id }}">{{ $item->name }}</option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <select name="w_state" class="select-input form-control minimal">
+                                                                                        <option value="">Select State</option>
+                                                                                        <option selected  value="{{@Auth::user()->profile->State->name}}">{{@Auth::user()->profile->State->name}}</option>
+
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" name="zipcode" value="{{@Auth::user()->profile->zipcode}}" class="form-control" placeholder="Zip Code">
+                                                                                </div>
+                                                                                
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <textarea class="form-control" name="Address"  placeholder="Address">{{@Auth::user()->profile->address}}</textarea>
+                                                                                </div>
+                                                                            </div>
+                                                                            <h3>Payment method</h3>
+                                                                            <div class="row">
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <select name="w_currency" class="select-input form-control minimal">
+                                                                                        <option value="play6">Play6 Token</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="number" onchange="validity.valid||(value='');" oninput="calculatedollars();"  min="50" id="withdrawaltokenamount" name="amount" class="form-control" placeholder="enter tokens amount here">
+                                                                                    <p class="col-lg-2 ml-lg-auto" style="float: left;" id="showcalculated_dollars"></p>
+                                                                                                    @php
+                                                                                                        $tok = DB::table('token_currencies')->where(['status'=>1,'doller'=>1])->first();
+                                                                                                        $tok=$tok->pley6_token;
+                                                                                                    @endphp
+
+                                                                                    <input type="hidden" id="tokensperdollar" value="{{ $tok }}">
+                                                                                
+                                                                                </div>
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <select name="payment_mathod_type" id="payment_mathod_type" class="select-input form-control minimal">
+                                                                                        {{-- <option value="">Select Payment Method</option> --}}
+                                                                                        {{-- <option value="1" id="cardoption">Card</option> --}}
+                                                                                        <option value="2" id="bankoption">Bank</option>
+                                                                                    </select>
+                                                                                </div>                                                                                
+                                                                            </div>
+                                                                            <h3>Bank information</h3>
+
+                                                                            {{-- <div class="row" id="card_method">
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <input type="text" class="form-control" name="w_card"  placeholder="1234 1234 1234 1234">
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" name="date" id="datepicker2" placeholder="Date">
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" class="form-control" name="cvc" placeholder="CVC">
+                                                                                </div>
+                                                                            </div> --}}
+
+                                                                            <div class="row" >
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" name="w_bank_name"  placeholder="Bank name">
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" class="form-control" name="w_account_number" placeholder="Account number">
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" name="ibpn"  placeholder="IBAN">
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" class="form-control" name="swift" placeholder="SWIFT">
+                                                                                </div>                                                                               
+                                                                            </div>
+                                                                            <div class="row">
+                                                                                <div class="col-lg-10 m-auto text-center">
+                                                                                    <button type="submit" id="Withdrw_Customer" class="btn">WITHDRAW</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                                                            <div><h4 style="font-size: 20px;text-align: center;color: white;padding: 15px;" >Deposit History    </h4></div>
+                                                                <div class="common-text-container" style="height: 300px;">
+                                                                    <div class="table-container withdraw-table" style=" height:250px;">
+                                                                        <table class="all-table table table-bordered table-striped table-hover table-dark" >
+                                                                            
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>ID</td>
+                                                                                    <td>date</td>
+                                                                                    <td>Amount</td>
+                                                                                    <td>TYPE</td>
+                                                                                </tr>
+                                                                                @php
+                                                                                    $transData = DB::table('deposits')->where('user_id' , @Auth::user()->id )->get();
+                                                                                @endphp
+                                                                                @if ($transData)
+                                                                                @foreach ($transData as $key => $item)                                                                                
+                                                                                    <tr>
+                                                                                        <td>PS1069{{$key+1}}</td>
+                                                                                        <td> {{\Carbon\Carbon::parse(@$item->created_at)->diffForHumans() }} </td>
+                                                                                        <td>${{ @$item->amount}}</td>
+                                                                                        <td>DEPOSIT</td>    
+                                                                                    </tr>
+                                                                                @endforeach                                                                                    
+                                                                                @endif
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                    
+                                                                </div>
+                                                                <div><h4 style="font-size: 20px;text-align: center;color: white;padding: 15px;" >Withdrawal History    </h4></div>
+
+                                                                <div class="common-text-container" style="height: 300px;">
+                                                                <div class="table-container withdraw-table" style=" height:250px;">
+                                                                        <table class="all-table table table-bordered table-striped table-hover table-dark mt-3">
+                                                                            
+                                                                            <tbody>
+                                                                                @php
+                                                                                    $withData = DB::table('withdraws')->where('user_id' , @Auth::user()->id )->get();
+                                                                                @endphp
+                                                                                <tr>
+                                                                                    <td>ID</td>
+                                                                                    <td>date</td>
+                                                                                    <td>Amount</td>
+                                                                                    <td>Status</td>
+                                                                                    <td> </td>       
+                                                                                </tr>
+                                                                                @php $tok = DB::table('token_currencies')->where(['status'=>1,'doller'=>1])->first(); @endphp
+
+                                                                                @foreach ($withData as $key => $item)
+                                                                                <tr>
+                                                                                    <td>DEF{{ $key+1 }}</td>
+                                                                                     <td>{{ date("Y-m-d",strtotime($item->created_at)) }}</td>
+                                                                                     <td>${{ ($item->amount)/ $tok->pley6_token }}</td>
+                                                                                    <td>
+                                                                                        @if (@$item->status == 0)
+                                                                                            <a href="#" class="badge badge-info">Pending</a>
+                                                                                        @endif
+                                                                                        @if (@$item->status == 1)
+                                                                                            <a href="#" class="badge badge-success">Completed</a>
+                                                                                        @endif
+                                                                                        @if (@$item->status == 2)
+                                                                                            <a href="#" class="badge badge-warning">Decline</a>
+                                                                                        @endif
+
+                                                                                    </td>
+                                                                                    
+                                                                                    <td>
+                                                                                    @if (@$item->status == 0)
+                                                                                        <a href="#" onclick="cancelTransaction({{ $item->id }})" title=" {{$item->status == 0?"Cancel":"Enable"}} this Withdraw" class="btn btn-info btn-sm"  ><i class="fas fa-ban"></i></a>
+                                                                                        <form id="active-form-{{ $item->id }}" action="{{ route('user.cancel_withdraw', $item->id) }}" method="POST" style="display: none;">
+                                                                                                @csrf
+                                                                                                @method('POST')
+                                                                                        </form>
+                                                                                        @endif
+                                                                                    
+                                                                                    </td>
+                                                                                </tr>                                                                                    
+                                                                                @endforeach
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-calculator" role="tabpanel" aria-labelledby="pills-calculator-tab">
+                                                                <div class="row">
+                                                                    <div class="col-xl-12 m-auto">
+                                                                        <div class="currency-convert">
+                                                                            <h2 class="just-grd">Currency Converter</h2>
+                                                                            <form>
+                                                                                <div class="row">
+                                                                                <div class="col-lg-2"></div>
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group mb-2">
+                                                                                        @php $tok = \App\TokenCurrency::where(['status'=>1,'doller'=>1])->first();   @endphp
+                                                                                        <input type="hidden" class="form-control" id="exRate" value=" {{  $tok->pley6_token  }} "/>
+                                                                                            <input type="number" class="form-control" id="usd_amount" placeholder="USD"/>
+                                                                                            <label id="currency-error" class="error" for="file"></label>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-4">
+                                                                                        <div class="form-group" style="text-align: left;" >
+                                                                                        <button type="button" class="btn calculate-btn btn-primary mb-2"  style=" margin-top:0px"  onclick="calToken()">Convert Curreny</button>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-12 text-center">
+                                                                                        <p id="show_token_detail" >  </p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </form>
+                                                                            <div class="result">
+                                                                                <p>
+                                                                                    <span class="given-amount"></span>
+                                                                                    <span class="base-currency"></span>
+                                                                                    <span class="final-result just-grd"></span>
+                                                                                    <span class="second-currency just-grd"></span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="VipShop" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">                                                        
+                                                        <div class="common-text-container">
+                                                            @php
+                                                                $shops = DB::table('add_shops')->where('status',1)->get();
+                                                            @endphp
+                                                            @foreach ($shopList as $item)
+                                                            <div class="common-text-box">
+                                                                <div class="row">
+                                                                    <div class="col-lg-2">
+                                                                        <div class="agriment-check">
+                                                                            <label for="checkbox" class="checkbox_label">
+                                                                                <img src="{{ isset($item->base_image) ? asset($item->base_image) : asset('assets/casino_user/images/mission-icon.png')}}" alt="pic" class="img-fluid">
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-10">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">{{ $item->name }}</h4>
+                                                                            <p>{{ ($item->type == 1 )?'Buy and get '. $item->amount .' Play6 Tokens now!': 'Buy and get '. $item->amount .' Free spin now!' }}</p>
+                                                                            <p>Price :  <b>{{ isset($item->price)? $item->price  : 0 }} Loyalty points </b></p>
+                                                                            <a class="btn " href="javascript:;" onclick="PlayShop({{@$item->id}})">Buy now</a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+@push('js')
+<script src="{{ asset('frontend/asset') }}/js/jquery-ui.min.js"></script>
+<script src="{{ asset('js/')}}/validate.js"></script>
+<script src="{{ asset('js/')}}/additional.js"></script>
+<script src="{{ asset('assets/casino_user/js/profile.js')}}"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script src="{{asset('backend/js/sweetaler2.js')}}"></script>
+<script> 
+
+function calToken() {
+        var tokensentered = document.getElementById("exRate").value;
+        var tokensperdollar = document.getElementById("usd_amount").value;
+        var usd = tokensentered*tokensperdollar;
+        console.log(usd);
+        $("#show_token_detail").text("Token : "+usd);
+    }
+</script>
+<script>
+ var lol = "<?php echo config('services.stripe.key'); ?>";    
+ 
+ // Create a Stripe client.
+var stripe = Stripe(lol);
+
+// Create an instance of Elements.
+var elements = stripe.elements();
+
+// Custom styling can be passed to options when creating an Element.
+// (Note that this demo uses a wider set of styles than the guide below.)
+var style = {
+  base: {
+    color: '#fff',
+    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+    fontSmoothing: 'antialiased',
+    fontSize: '17px',
+    '::placeholder': {
+      color: '#fff'
+    }
+  },
+  invalid: {
+    color: '#fa755a',
+    iconColor: '#fa755a'
+  }
+};
+
+// Create an instance of the card Element.
+var card = elements.create('cardNumber', {
+    classes:{
+        base:"form-control",
+        invalid:"error",
+        focus:"white"
+    },
+    style:style
+});
+var exp = elements.create('cardExpiry', {
+    classes:{
+        base:"form-control",
+        invalid:"error",
+        focus:"white"
+    },
+    style:style
+});
+var cvc = elements.create('cardCvc', {
+    classes:{
+        base:"form-control",
+        invalid:"error",
+        focus:"white"
+    },
+    style:style
+});
+
+// Add an instance of the card Element into the `card-element` <div>.
+card.mount('#card-element');
+exp.mount('#card-exp');
+cvc.mount('#card-cvc');
+
+// Handle real-time validation errors from the card Element.
+card.addEventListener('change', function(event) {
+  var displayError = document.getElementById('card-errors');
+  if (event.error) {
+    displayError.textContent = event.error.message;
+  } else {
+    displayError.textContent = '';
+  }
+});
+
+// Handle form submission.
+var form = document.getElementById('payment-form');
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  stripe.createToken(card).then(function(result) {
+    if (result.error) {
+      // Inform the user if there was an error.
+      var errorElement = document.getElementById('card-errors');
+      errorElement.textContent = result.error.message;
+    } else {
+      // Send the token to your server.
+      stripeTokenHandler(result.token);
+    }
+  });
+});
+
+// Submit the form with the token ID.
+function stripeTokenHandler(token) {
+  // Insert the token ID into the form so it gets submitted to the server
+  var form = document.getElementById('payment-form');
+  var hiddenInput = document.createElement('input');
+  hiddenInput.setAttribute('type', 'hidden');
+  hiddenInput.setAttribute('name', 'stripeToken');
+  hiddenInput.setAttribute('value', token.id);
+  form.appendChild(hiddenInput);
+
+  // Submit the form
+  form.submit();
+}
+</script>
+
+<script>
+ 
+function calculatedollars() {
+        var tokensentered = document.getElementById("withdrawaltokenamount").value;
+        var tokensperdollar = document.getElementById("tokensperdollar").value;
+        var usd = tokensentered/tokensperdollar;
+        console.log(usd);
+        $("#showcalculated_dollars").text("Dollars="+usd);
+    }
+</script>
+
+ <script>
+        $(document).ready(function () {
+            var hidden_phone_code = document.getElementById("hidden_phone_code").value;
+            $("#phoneField11").CcPicker({
+                "countryCode":hidden_phone_code,
+            }
+                
+            );
+            if (window.location.hash=="#deposit"){ document.querySelectorAll('.tablinks')[1].click() }
+        });
+        
+        $("#deposite_usd").change(function(){
+            var usd = document.getElementById("deposite_usd").value;
+            var tokenRate = document.getElementById("hidden_PlaySix_token").value;
+            $("#PlaySix_token").val(tokenRate*usd);
+        });
+        function PopUp(val) {
+        swal({
+        text: val,
+        width:600,
+        textColor:'#000',
+        showClass: {
+            popup: 'animated fadeInDown faster'
+        },
+        hideClass: {
+            popup: 'animated fadeOutUp faster'
+        }
+        })
+    }
+
+    function cancelTransaction(id) {
+            swal({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                type: 'warning',
+                showCancelButton: false,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Confirm!!',
+                cancelButtonText: 'No, cancel!',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.value) {
+                event.preventDefault();
+                document.getElementById('active-form-'+id).submit();
+            } else if (
+                // Read more about handling dismissals
+            result.dismiss === swal.DismissReason.cancel
+            ) {
+                swal(
+                    'Cancelled',
+                    'nothing happen :)',
+                    'error'
+                )
+            }
+        })
+        }
+
+    </script>
+@endpush

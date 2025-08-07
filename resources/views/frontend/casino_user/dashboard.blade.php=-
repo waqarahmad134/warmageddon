@@ -1,0 +1,1145 @@
+@extends('frontend.casino_user.app')
+@push('css')
+  <style>
+     label.error{
+    color: red;
+    font-style: italic;
+    font-size: 14px;
+    font-weight: 200;
+    font-family: sans-serif;
+     }
+  </style>
+@endpush
+@section('content')
+<div class="all-wrapper section-gap section-gap-top-big">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="myaccount-container">
+                    <div class="row">
+                        <div class="col-xl-4">
+                            <div class="myaccount-imagebox-container">
+                                <div class="myaccount-imagebox">
+                                    <img src="{{@Auth::user()->profile->base_image?url(Auth::user()->profile->base_image):asset('assets/casino_user/images/avater.png')}}" alt="pic" class="img-fluid">
+                                </div>
+                                <div class="myaccount-imagebox-text">
+                                    <p class="just-grd"><b>{{ @Auth::user()->user_name }}</b></p>
+                                    <p>USD : <b class="just-grd">{{ @Auth::user()->account->total? (@Auth::user()->account->total)/10 : 0 }}</b></p>
+                                    <p>PLAY6 TOKEN : <b class="just-grd">{{ @Auth::user()->account->total? @Auth::user()->account->total : 0 }}</b></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xl-7 m-auto">
+                            <div class="myaccount-boxes-main">
+                                <a href="{{ route('index')}}">
+                                    <div class="myaccount-box-wrapper ml-0">
+                                        <div class="myaccount-box">
+                                            <img src="{{ asset('assets/casino_user/')}}/images/actop-ico1.png" alt="pic" class="img-fluid">
+                                        </div>
+                                        <p>HOME</p>
+                                    </div>
+                                </a>
+                                <div class="myaccount-box-wrapper">
+                                    <div class="myaccount-box">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actop-ico2.png" alt="pic" class="img-fluid">
+                                    </div>
+                                    <p>MISSIONS</p>
+                                </div>
+                                <div class="myaccount-box-wrapper">
+                                    <div class="myaccount-box">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actop-ico3.png" alt="pic" class="img-fluid">
+                                    </div>
+                                    <p>NEXT $2,50</p>
+                                </div>
+                                <div class="myaccount-box-wrapper">
+                                    <div class="myaccount-box">
+                                        <div class="ldBar label-center" data-value="35" data-type="stroke" data-stroke="data:ldbar/res,gradient(0,1,#cba244,#ffffff)" data-stroke-trail="rgba(255,255,255,0.33)" data-stroke-trail-width="10" data-preset="circle"></div>
+                                    </div>
+                                    <p>BRONZE STEP</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="myaccount-tab-main">
+                        <div class="row">
+                            <div class="col-xl-4">
+                                <div class="tab">
+                                    <button class="tablinks my-ml" onclick="openCity(event, 'Mission')" id="defaultOpen">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon1.png" alt="pic" class="img-fluid">
+                                        <p>Missions</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Banking')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon8.png" alt="pic" class="img-fluid">
+                                        <p>Banking</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Loyalty')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon2.png" alt="pic" class="img-fluid">
+                                        <p>Loyalty</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Bonus')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon3.png" alt="pic" class="img-fluid">
+                                        <p>Bonus</p>
+                                    </button>
+                                    <button class="tablinks my-ml" onclick="openCity(event, 'Favorites')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon4.png" alt="pic" class="img-fluid">
+                                        <p>Favorites</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Settings')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon6.png" alt="pic" class="img-fluid">
+                                        <p>Settings</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'Inbox')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon5.png" alt="pic" class="img-fluid">
+                                        <p>Inbox</p>
+                                    </button>
+                                    <button class="tablinks" onclick="openCity(event, 'History')">
+                                        <img src="{{ asset('assets/casino_user/')}}/images/actab-icon7.png" alt="pic" class="img-fluid">
+                                        <p>History</p>
+                                    </button>
+                                    <div class="clr"></div>
+                                </div>
+                            </div>
+                            <div class="col-xl-8">
+                                <div id="Mission" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <!--<div class="common-text-box">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div class="mission-header">
+                                                                        <p><img src="{{ asset('assets/casino_user/')}}/images/mission-head-icon.png" alt="pic">choose 1 out of 6 mission by jan 01, 00:00 wet</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>-->
+                                                        <div class="common-text-container">
+                                                            <div class="common-text-box">
+                                                                <div class="row">
+                                                                    <div class="col-lg-2">
+                                                                        <div class="agriment-check">
+                                                                            <label for="checkbox" class="checkbox_label">
+                                                                                <input type="checkbox" class="checkbox_input" id="checkbox" name="check">
+                                                                                <img src="{{ asset('assets/casino_user/')}}/images/mission-icon.png" alt="pic" class="img-fluid">
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-10">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">Play 10 cash games hands</h4>
+                                                                            <p>bronze loyalty (cash table only. max 0.05/0.10. heads up and fixed limit excluded)</p>
+                                                                            <a href="#">terms and condition apply</a>
+                                                                            <p>Prize :  <b>0/1</b></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="common-text-box">
+                                                                <div class="row">
+                                                                    <div class="col-lg-2">
+                                                                        <div class="agriment-check">
+                                                                            <label for="checkbox" class="checkbox_label">
+                                                                                <input type="checkbox" class="checkbox_input" id="checkbox" name="check">
+                                                                                <img src="{{ asset('assets/casino_user/')}}/images/mission-icon1.png" alt="pic" class="img-fluid">
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-10">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">Play 10 cash games hands</h4>
+                                                                            <p>bronze loyalty (cash table only. max 0.05/0.10. heads up and fixed limit excluded)</p>
+                                                                            <a href="#">terms and condition apply</a>
+                                                                            <p>Prize :  <b>0/1</b></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="common-text-box">
+                                                                <div class="row">
+                                                                    <div class="col-lg-2">
+                                                                        <div class="agriment-check">
+                                                                            <label for="checkbox" class="checkbox_label">
+                                                                                <input type="checkbox" class="checkbox_input" id="checkbox" name="check">
+                                                                                <img src="{{ asset('assets/casino_user/')}}/images/mission-icon.png" alt="pic" class="img-fluid">
+                                                                            </label>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-lg-10">
+                                                                        <div class="mission-text-box">
+                                                                            <h4 class="just-grd">Play 10 cash games hands</h4>
+                                                                            <p>bronze loyalty (cash table only. max 0.05/0.10. heads up and fixed limit excluded)</p>
+                                                                            <a href="#">terms and condition apply</a>
+                                                                            <p>Prize :  <b>0/1</b></p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Loyalty" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-6 col-lg-8 m-auto">
+                                                <div class="tab-loyalty-box">
+                                            <div class="para-box">
+                                                <h4 class="just-grd">LOYALTY PROGRESS</h4>
+                                                <p>your current status : <b class="just-grd">Bronze</b></p>
+                                                <p>your current step : <b class="just-grd">1 of 15</b></p>
+                                                <p>complete 15 more steps this month to achieve silver status and earn even more play6 token</p>
+                                            </div>
+                                            <div class="para-box pb-0">
+                                                <h4 class="just-grd">CURRENT STEP PROGRESS</h4>
+                                                <p>complete this step this month to earn 1 play6 token</p>
+                                            </div>
+
+                                            <div class="tab-loader">
+                                                <div class="ldBar label-center" data-value="65" data-type="stroke" data-stroke="data:ldbar/res,gradient(0,1,#ca6e05,#ffee97)" data-stroke-trail="rgba(255,255,255,0.33)" data-stroke-trail-width="14" data-preset="circle"></div>
+                                                <p>status points : <b class="just-grd">0/2</b></p>
+                                            </div>
+
+                                            <div class="para-box">
+                                                <p>status points needed to complete this step : <b class="just-grd">2</b></p>
+                                                <p>you can earn 10 status point for every $1 paid in rake or free</p>
+                                            </div>
+                                            <div class="para-box">
+                                                <p>play6 coins blance : <b class="just-grd">0</b></p>
+                                                <p>visit our store to see your rewards</p>
+                                            </div>
+                                        </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-8 m-auto">
+                                                <div class="tab-loyalty-box tab-loyalty-box2">
+                                                    <div class="para-box">
+                                                        <h4 class="just-grd">REWARD PROGRESS</h4>
+                                                        <p>earn more 1500 status points before Feb 01 to achieve rewards</p>
+                                                    </div>
+                                                    <div class="tab-loader">
+                                                        <div class="ldBar label-center" data-value="50" data-type="stroke" data-stroke="data:ldbar/res,gradient(0,1,#cba244,#ffffff)" data-stroke-trail="rgba(255,255,255,0.33)" data-stroke-trail-width="14" data-preset="circle"></div>
+                                                        <p>status points : <b class="just-grd">0/15,00</b></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Bonus" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-6 col-lg-8 m-auto">
+                                                <div class="tab-loyalty-box">
+                                                    <div class="para-box">
+                                                        <h4 class="just-grd">Active bonus</h4>
+                                                        <p>total status points required : <b class="just-grd">50 play6</b></p>
+                                                        <p>issued : <b class="just-grd">12-10-2019</b></p>
+                                                        <p>expires : <b class="just-grd">5-10-2020</b></p>
+                                                        <p>released : <b class="just-grd">$0</b></p>
+                                                        <p>next release : <b class="just-grd">$2.50</b></p>
+                                                    </div>
+                                                    <div class="para-box pb-0">
+                                                        <h4 class="just-grd">CURRENT STEP PROGRESS</h4>
+                                                        <p>25 play6 to next $2.50 release</p>
+                                                    </div>
+                                                    
+                                                    <div class="progress-bar-img">
+                                                        <img src="{{ asset('assets/casino_user/')}}/images/bonus.png" alt="pic" class="img-fluid">
+                                                    </div>
+                                                    
+                                                    <div class="progress">
+                                                        <div class="progress-bar" style="width:45%"></div>
+                                                    </div>
+                                                    <div class="progress-bar-text">
+                                                        <p class="text-left">$0</p>
+                                                        <p>$5.0</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-xl-6 col-lg-8 m-auto">
+                                                <div class="tab-loyalty-box tab-loyalty-box2">
+                                                    <div class="para-box">
+                                                        <h4 class="just-grd">Next</h4>
+                                                        <p>issued : <b class="just-grd">12-10-2019</b></p>
+                                                        <p>expires : <b class="just-grd">5-10-2020</b></p>
+                                                        <p>bonus size : <b class="just-grd">$60</b></p>
+                                                        <p>points : <b class="just-grd">25000 play6</b></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Favorites" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <p class="subtitle just-grd">My Favorites Games</p>
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <div class="common-text-container">
+                                                            <div class="common-text-box">
+                                                                <div class="row">
+                                                                    <div class="col-md-4">
+                                                                        <div class="favorite-img-box">
+                                                                            <img src="{{ asset('assets/casino_user/')}}/images/kingslots.jpg" alt="piv">
+                                                                            <div class="overlay">
+                                                                                <div class="overlay-text">
+                                                                                    <a href="#" class="btn">Play Real</a>
+                                                                                    <a href="#" class="btn">Play Demo</a>
+                                                                                    <p>King Slot</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <a href="#" class="icon-btn"><i class="fas fa-times text-danger"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <div class="favorite-img-box">
+                                                                            <img src="{{ asset('assets/casino_user/')}}/images/Blackjack.jpg" alt="piv">
+                                                                            <div class="overlay">
+                                                                                <div class="overlay-text">
+                                                                                    <a href="#" class="btn">Play Real</a>
+                                                                                    <a href="#" class="btn">Play Demo</a>
+                                                                                    <p>Blackjack</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <a href="#" class="icon-btn"><i class="fas fa-times text-danger"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <div class="favorite-img-box">
+                                                                            <img src="{{ asset('assets/casino_user/')}}/images/keno.jpg" alt="piv">
+                                                                            <div class="overlay">
+                                                                                <div class="overlay-text">
+                                                                                    <a href="#" class="btn">Play Real</a>
+                                                                                    <a href="#" class="btn">Play Demo</a>
+                                                                                    <p>keno</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <a href="#" class="icon-btn"><i class="fas fa-times text-danger"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col-md-4">
+                                                                        <div class="favorite-img-box mb-0">
+                                                                            <img src="{{ asset('assets/casino_user/')}}/images/Sicbo.jpg" alt="piv">
+                                                                            <div class="overlay">
+                                                                                <div class="overlay-text">
+                                                                                    <a href="#" class="btn">Play Real</a>
+                                                                                    <a href="#" class="btn">Play Demo</a>
+                                                                                    <p>Sicbo</p>
+                                                                                </div>
+                                                                            </div>
+                                                                            <a href="#" class="icon-btn"><i class="fas fa-times text-danger"></i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Inbox" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                            <li class="nav-item tab-item ml-0">
+                                                                <a class="nav-link btn tab-btn active" id="pills-inbox-tab" data-toggle="pill" href="#pills-inbox" role="tab" aria-controls="pills-home" aria-selected="true">All</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-read-tab" data-toggle="pill" href="#pills-read" role="tab" aria-controls="pills-profile" aria-selected="false">Read</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-unread-tab" data-toggle="pill" href="#pills-unread" role="tab" aria-controls="pills-contact" aria-selected="false">Unread</a>
+                                                            </li>
+                                                        </ul>
+                                                        <div class="tab-content" id="pills-tabContent">
+                                                            <div class="tab-pane fade show active" id="pills-inbox" role="tabpanel" aria-labelledby="pills-inbox-tab">
+                                                                <div class="info-icon-wrap text-right">
+                                                                    <a href="#" class="info-icon"><i class="fas fa-envelope"></i> <span>5</span></a>
+                                                                    <a href="#" class="info-icon"><i class="fas fa-folder-minus text-danger"></i></a>
+                                                                </div>
+                                                                <div class="common-text-container">
+                                                                    <div class="common-text-box unread">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <input type="checkbox" class="checkbox_input" id="checkbox" name="check"><span class="just-grd">SUPPORT</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <p class="badge badge-secondary"><i>03/12/20</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p><b>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam cum quam, laboriosam consequatur tempora voluptate?</b></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="common-text-box">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <input type="checkbox" class="checkbox_input" id="checkbox" name="check"><span class="just-grd">SUPPORT</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <p class="badge badge-secondary"><i>03/12/20</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam cum quam, laboriosam consequatur tempora voluptate?</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="common-text-box">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <input type="checkbox" class="checkbox_input" id="checkbox" name="check"><span class="just-grd">SUPPORT</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <p class="badge badge-secondary"><i>03/12/20</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam cum quam, laboriosam consequatur tempora voluptate?</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="common-text-box">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <input type="checkbox" class="checkbox_input" id="checkbox" name="check"><span class="just-grd">SUPPORT</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <p class="badge badge-secondary"><i>03/12/20</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam cum quam, laboriosam consequatur tempora voluptate?</p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-read" role="tabpanel" aria-labelledby="pills-read-tab">
+                                                                <div class="info-icon-wrap text-right">
+                                                                    <a href="#" class="info-icon"><i class="fas fa-envelope"></i> <span>5</span></a>
+                                                                    <a href="#" class="info-icon"><i class="fas fa-folder-minus text-danger"></i></a>
+                                                                </div>
+                                                                <div class="common-text-container">
+                                                                    <div class="common-text-box">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <input type="checkbox" class="checkbox_input" id="checkbox" name="check"><span class="just-grd">SUPPORT</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <p class="badge badge-secondary"><i>03/12/20</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p><i>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam cum quam, laboriosam consequatur tempora voluptate?</i></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="common-text-box">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <input type="checkbox" class="checkbox_input" id="checkbox" name="check"><span class="just-grd">SUPPORT</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <p class="badge badge-secondary"><i>03/12/20</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p><i>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam cum quam, laboriosam consequatur tempora voluptate?</i></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-unread" role="tabpanel" aria-labelledby="pills-unread-tab">
+                                                                <div class="info-icon-wrap text-right">
+                                                                    <a href="#" class="info-icon"><i class="fas fa-envelope"></i> <span>5</span></a>
+                                                                    <a href="#" class="info-icon"><i class="fas fa-folder-minus text-danger"></i></a>
+                                                                </div>
+                                                                <div class="common-text-container">
+                                                                    <div class="common-text-box unread">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-3">
+                                                                                <div class="agriment-check">
+                                                                                    <label for="checkbox" class="checkbox_label">
+                                                                                        <input type="checkbox" class="checkbox_input" id="checkbox" name="check"><span class="just-grd">SUPPORT</span>
+                                                                                    </label>
+                                                                                </div>
+                                                                                <p class="badge badge-secondary"><i>03/12/20</i></p>
+                                                                            </div>
+                                                                            <div class="col-lg-9">
+                                                                                <p><b>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Magnam cum quam, laboriosam consequatur tempora voluptate?</b></p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="Settings" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                            <li class="nav-item tab-item ml-0">
+                                                                <a class="nav-link btn tab-btn active" id="pills-general-tab" data-toggle="pill" href="#pills-general" role="tab" aria-controls="pills-home" aria-selected="true">General</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-Security-tab" data-toggle="pill" href="#pills-Security" role="tab" aria-controls="pills-profile" aria-selected="false">Security</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-Document-tab" data-toggle="pill" href="#pills-Document" role="tab" aria-controls="pills-contact" aria-selected="false">Document</a>
+                                                            </li>
+                                                        </ul>
+                                                        <div class="tab-content" id="pills-tabContent">
+                                                            <div class="tab-pane fade show active" id="pills-general" role="tabpanel" aria-labelledby="pills-general-tab">
+                                                                <div class="user-info-part">
+                                                                    <div class="user-info-text">
+                                                                        <p>EDIT YOUR PERSONAL SETTINGS</p>
+                                                                    </div>
+                                                                    <img src="{{@Auth::user()->profile->base_image?url(Auth::user()->profile->base_image):asset('assets/casino_user/images/avater.png')}}" alt="pic" class="img-fluid">
+                                                                    
+                                                                    <form id="profile_update" action="{{route('user.update',@Auth::user()->id)}}" method="post" enctype="multipart/form-data">
+                                                                        @csrf
+                                                                        <div class="row">
+                                                                            <div class="col-lg-5 ml-lg-auto">
+                                                                                <input type="text" class="form-control" name="first_name" value="{{@Auth::user()->profile->first_name}}" placeholder="First Name">
+                                                                            </div>
+                                                                            <div class="col-lg-5 mr-lg-auto">
+                                                                                <input type="text" class="form-control" name="last_name" value="{{@Auth::user()->profile->last_name}}" placeholder="Last Name">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="email" class="form-control" value="{{@Auth::user()->email}}" placeholder="Email Address">
+                                                                            </div>
+                                                                            <div class="col-lg-5 ml-lg-auto">
+                                                                                <input type="text" class="form-control" name="dob" id="datepicker" value="{{@Auth::user()->profile->date_of_birth}}" placeholder="Date of birth">
+                                                                            </div>
+                                                                            <div class="col-lg-5 mr-lg-auto">
+                                                                                <input type="text" class="form-control" name="phone"  value="{{@Auth::user()->phone}}" placeholder="Phone No.">
+                                                                            </div>
+                                                                            @php
+                                                                                $countries = DB::table('countries')->orderBy('name', 'asc')->get();
+                                                                            @endphp
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <select class="select-input form-control minimal" name="country" id="" required>
+                                                                                    <option value="">Country</option>
+                                                                                    @foreach($countries as $item)
+                                                                                        <option  {{@Auth::user()->profile->Country->id == $item->id ? 'selected' :""}}  value="{{ $item->id }}">{{ $item->name }}</option>
+                                                                                    @endforeach
+                                                                             </select>
+                                                                            </div>
+                                                                            <div class="col-lg-5 ml-lg-auto">
+                                                                                <select class="select-input form-control minimal" name="state" id="" required>
+                                                                                    <option  value="{{@Auth::user()->profile->State->name}}">{{@Auth::user()->profile->State->name}}</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-lg-5 mr-lg-auto">
+                                                                                <input type="text" class="form-control" name="zipcode" value="{{@Auth::user()->profile->zipcode}}" placeholder="Zip Code">
+                                                                            </div>
+
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <textarea class="form-control" name="Address" placeholder="Address">{{@Auth::user()->profile->address}}</textarea>
+                                                                            </div>
+                                                                            <div class="col-lg-5 m-auto">
+                                                                                <div class="file-input form-control">
+                                                                                   <input type="file" name="image" value="{{ @Auth::user()->profile->base_image }}">
+                                                                                    <span onchange="ProPic(this)" class="button">Choose</span>
+                                                                                    <span class="label" data-js-label>Profile Picture</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" class="btn">Update</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-Security" role="tabpanel" aria-labelledby="pills-Security-tab">
+                                                                <div class="user-info-part">
+                                                                    <div class="user-info-text">
+                                                                        <p>EDIT YOUR Security Section</p>
+                                                                    </div>
+                                                                    <form id="Security_user" action="{{route('user.Security',@Auth::user()->id)}}" method="POST">
+                                                                        @csrf
+                                                                        <h3>Change Security Question</h3>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <select name="secret_question" class="select-input form-control minimal">
+                                                                                    <option value="0">Select Secturity Question</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is the hidden name of my mother?' ?'selected' :'' }} value="What is the hidden name of my mother?">What's my mother's hidden name?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is my favourite hobby?' ?'selected' :'' }} value="What is my favourite hobby?">What's my favourite hobby?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is my favourite sport club?' ?'selected' :'' }} value="What is my favourite sport club?">What's my favourite sport club?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is the name of my favourite book?' ?'selected' :'' }} value="What is the name of my favourite book?">What's the name of my favourite book?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'Who was my childhood hero?' ?'selected' :'' }} value="Who was my childhood hero?">Who was my childhood hero?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is the name of my pet?' ?'selected' :'' }} value="What is the name of my pet?">What's the name of my pet?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is my nickname?' ?'selected' :'' }} value="What is my nickname?">What's my nickname?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What was the make of my first car?' ?'selected' :'' }} value="What was the make of my first car?">What was the make of my first car?</option>
+                                                                                    <option {{ @Auth::user()->profile->secret_question == 'What is my secret code?' ?'selected' :'' }} value="What is my secret code?">What's my secret code?</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                               <input name="secret_answer" type="text" value="{{ @Auth::user()->profile->secret_answer }}" class="form-control" placeholder="Answer">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="password" name="password" class="form-control" placeholder="Password">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" class="btn">Update</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+                                                                    <form action="{{route('user.PasswordChange',@Auth::user()->id)}}" method="POST" id="password_change">
+                                                                        @csrf
+                                                                        <h3>Change PASSWORD</h3>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="password" class="form-control" name="old_password" placeholder="Old Password">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="password" id="pass" class="form-control" name="password" placeholder="New Password">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <input type="password" class="form-control" name="password_confirmation" placeholder="Confirm Password">
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" class="btn">Update</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-Document" role="tabpanel" aria-labelledby="pills-Document-tab">
+                                                                <div class="user-info-part">
+                                                                    <div class="user-info-text">
+                                                                        <p>PLEASE PROVIDE A COPY OF YOUR ID CARD OR PASSPORT. MAXIMUM ACCEPTED FILE SIZE IS 10MB. THE DOCUMENT NEEDS TO CLEARLY SHOW YOUR NAME, ADDRESS AND MATCH THE INFORMATION WHICH YOU’VE PROVIDED IN YOUR ACCOUNT.</p>
+                                                                    </div>
+                                                                    <form action="">
+                                                                        <h3>TYPE OF DOCUMENT</h3>
+                                                                        <div class="row">
+                                                                            <div class="col-lg-10 m-auto">
+                                                                                <select name="" class="select-input form-control minimal">
+                                                                                    <option value="usd">Please Choose</option>
+                                                                                    <option value="eur">ID Card / Document</option>
+                                                                                    <option value="eur">Passport</option>
+                                                                                    <option value="eur">Driving Licence</option>
+                                                                                </select>
+                                                                            </div>
+                                                                            <div class="col-lg-10 m-auto text-center">
+                                                                                <button type="submit" class="btn">Submit</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </form>
+                                                                    <div class="table-container withdraw-table">
+                                                                        <table class="all-table table table-bordered table-striped table-hover table-dark mt-3">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <td colspan="8">All information</td>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>date</td>
+                                                                                    <td>Type</td>
+                                                                                    <td>Status</td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td>2019-06-28</td>
+                                                                                    <td>ID card / document</td>
+                                                                                    <td><a href="#" class="badge badge-info">Pending</a></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td>2019-06-28</td>
+                                                                                    <td>Passport</td>
+                                                                                    <td><a href="#" class="badge badge-success">Accepted</a></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td>2019-06-28</td>
+                                                                                    <td>Driving Licence</td>
+                                                                                    <td><a href="#" class="badge badge-warning">Decline</a></td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="History" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="para-box">
+                                            <h4 class="just-grd">Feature Coming Soon!</h4>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                                <div id="Banking" class="tabcontent">
+                                    <div class="sub-tabcontainer">
+                                        <div class="row">
+                                            <div class="col-xl-12">
+                                                <div class="container-box-main">
+                                                    <div class="container-box">
+                                                        <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                                                            <li class="nav-item tab-item ml-0">
+                                                                <a class="nav-link btn tab-btn active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Deposit</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-profile-tab" data-toggle="pill" href="#pills-profile" role="tab" aria-controls="pills-profile" aria-selected="false">Withdraw</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-contact-tab" data-toggle="pill" href="#pills-contact" role="tab" aria-controls="pills-contact" aria-selected="false">Transaction History</a>
+                                                            </li>
+                                                            <li class="nav-item tab-item">
+                                                                <a class="nav-link btn tab-btn" id="pills-calculator-tab" data-toggle="pill" href="#pills-calculator" role="tab" aria-controls="pills-calculator" aria-selected="false">Convert Currency</a>
+                                                            </li>
+                                                        </ul>
+                                                        <div class="tab-content" id="pills-tabContent">
+                                                            <div class="tab-pane fade show active" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+                                                                <div class="deposite-main">
+                                                                    <div class="deposite-hreader">
+                                                                        <p>Make your instant transfers from bank account with our preferred depositing option</p>
+                                                                    </div>
+                                                                    <div class="deposite-brand">
+                                                                        <div class="row">
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/marter-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/visa-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/net-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/skrill-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="deposite-form">
+                                                                        <form action="{{ route('paymentDeposit')}}" method="POST" id="payment-form">
+                                                                            @csrf
+                                                                            <h3>Personal Information</h3>
+                                                                            <div class="row">
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" name="first_name" value="{{@Auth::user()->profile->first_name}}" placeholder="First Name" >
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" name="last_name" value="{{@Auth::user()->profile->last_name}}" class="form-control" placeholder="Last Name">
+                                                                                </div>
+                                                                                @php
+                                                                                    $countries = DB::table('countries')->orderBy('name', 'asc')->get();
+                                                                                @endphp
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <select name="country" class="select-input form-control minimal">
+                                                                                        <option value="">Country</option>
+                                                                                        @foreach($countries as $item)
+                                                                                            <option  {{@Auth::user()->profile->Country->id == $item->id ? 'selected' :""}}  value="{{ $item->id }}">{{ $item->name }}</option>
+                                                                                        @endforeach
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <select name="state" class="select-input form-control minimal">
+                                                                                        <option value="">Select State</option>
+                                                                                        <option selected  value="{{@Auth::user()->profile->State->name}}">{{@Auth::user()->profile->State->name}}</option>
+
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" name="zipcode" value="{{@Auth::user()->profile->zipcode}}" class="form-control" placeholder="Zip Code">
+                                                                                </div>
+                                                                                
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <textarea class="form-control" name="Address"  placeholder="Address">{{@Auth::user()->profile->address}}</textarea>
+                                                                                </div>
+                                                                            </div>
+                                                                            <h3>Card Information</h3>
+                                                                            <div class="row">
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <input type="eamil" class="form-control" name="email" value="{{@Auth::user()->email}}" placeholder="Email Address">
+                                                                                </div>
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <select name="" class="select-input form-control minimal">
+                                                                                        <option value="usd">USD</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" name="amount" placeholder="Amount">
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" class="form-control" name="bonus_code" placeholder="Bonus Code">
+                                                                                </div>
+                                                                                
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    
+                                                                                      <div id="card-element">
+                                                                                      </div>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <div id="card-exp">
+                                                                                    </div>                                                                                    
+                                                                                    
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <div id="card-cvc">
+                                                                                    </div>                                                                                    
+                                                                                    
+                                                                                </div>                                                                               
+                                                                                <div class="col-lg-10 m-auto text-center">
+                                                                                    <label class="error" id="card-errors" role="alert"></label>
+                                                                                </div> 
+                                                                                <div class="col-lg-10 m-auto text-center">
+                                                                                    {{-- <p><b>EUR 100</b> will be debited from your payment method</p> --}}
+                                                                                    <button type="submit" class="btn">DEPOSIT</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-profile" role="tabpanel" aria-labelledby="pills-profile-tab">
+                                                                <div class="deposite-main">
+                                                                    <h3 class="text-center just-grd">Acceptable Payment Methods</h3>
+                                                                    <div class="deposite-brand">
+                                                                        <div class="row">
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/marter-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/visa-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6 mb-3">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/net-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="col-md-3 col-sm-6">
+                                                                                <div class="brand-box">
+                                                                                    <img src="{{ asset('assets/casino_user/')}}/images/skrill-card.png" alt="pic" class="img-fluid">
+                                                                                </div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="deposite-form">
+                                                                        <form action="">
+                                                                            <div class="row">
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <select name="" class="select-input form-control minimal">
+                                                                                        <option value="usd">USD</option>
+                                                                                        <option value="eur">EUR</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" placeholder="100">
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" class="form-control" placeholder="Bouns Code">
+                                                                                </div>
+                                                                                <div class="col-lg-10 m-auto">
+                                                                                    <select name="" class="select-input form-control minimal">
+                                                                                        <option value="usd">Select Payment Method</option>
+                                                                                        <option value="eur">Master</option>
+                                                                                        <option value="eur">Visa</option>
+                                                                                    </select>
+                                                                                </div>
+                                                                                <div class="col-lg-5 ml-lg-auto">
+                                                                                    <input type="text" class="form-control" id="datepicker2" placeholder="Date">
+                                                                                </div>
+                                                                                <div class="col-lg-5 mr-lg-auto">
+                                                                                    <input type="text" class="form-control" placeholder="CVC">
+                                                                                </div>
+                                                                                <div class="col-lg-10 m-auto text-center">
+                                                                                    <button type="submit" class="btn">WITHDRAW</button>
+                                                                                </div>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                    <div class="table-container withdraw-table">
+                                                                        <table class="all-table table table-bordered table-striped table-hover table-dark mt-3">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <td colspan="8">pending withdraw</td>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>ID</td>
+                                                                                    <td>date</td>
+                                                                                    <td>Status</td>
+                                                                                    <td>Active</td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td>DEF85TR</td>
+                                                                                    <td>2019-06-28</td>
+                                                                                    <td><a href="#" class="badge badge-info">Pending</a></td>
+                                                                                    <td><a href="#" class="badge badge-danger">Cancle</a></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td>DEF85TR</td>
+                                                                                    <td>2019-06-28</td>
+                                                                                    <td><a href="#" class="badge badge-success">Completed</a></td>
+                                                                                    <td><a href="#" class="badge badge-danger">Cancle</a></td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <td>DEF85TR</td>
+                                                                                    <td>2019-06-28</td>
+                                                                                    <td><a href="#" class="badge badge-warning">Decline</a></td>
+                                                                                    <td><a href="#" class="badge badge-danger">Cancle</a></td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-contact" role="tabpanel" aria-labelledby="pills-contact-tab">
+                                                                <div class="common-text-container">
+                                                                    <div class="table-container withdraw-table">
+                                                                        <table class="all-table table table-bordered table-striped table-hover table-dark">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <td colspan="8">ALL HISTORY</td>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>ID</td>
+                                                                                    <td>date</td>
+                                                                                    <td>Amount</td>
+                                                                                    <td>TYPE</td>
+                                                                                </tr>
+                                                                            @foreach ($user->transaction as $key => $item)                                                                                
+                                                                                <tr>
+                                                                                    <td>PS1069{{$key+1}}</td>
+                                                                                    <td> {{ $item->created_at->diffForHumans() }} </td>
+                                                                                    <td>${{ $item->amount}}</td>
+                                                                                    <td>{{ $item->type }}</td>
+                                                                                </tr>
+                                                                                @endforeach
+
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="tab-pane fade" id="pills-calculator" role="tabpanel" aria-labelledby="pills-calculator-tab">
+                                                                <div class="row">
+                                                                    <div class="col-xl-12 m-auto">
+                                                                        <div class="currency-convert">
+                                                                            <h2 class="just-grd">Currency Converter</h2>
+                                                                            <p>Convert the currency</p>
+                                                                            <form>
+                                                                                <div class="row">
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group mb-2">
+                                                                                            <input type="text" class="form-control" id="amount" />
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-6">
+                                                                                        <div class="form-group">
+                                                                                            <select class="select-input form-control minimal" id="currency-1" required>
+                                                                                                <option>USD</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                    <div class="col-lg-6 m-auto">
+                                                                                        <div class="form-group">
+                                                                                            <h3 class="just-grd">convert to</h3>
+                                                                                            <select class="select-input form-control minimal" id="currency-2">
+                                                                                                <option>PLAY6</option>
+                                                                                            </select>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="row">
+                                                                                    <div class="col-12 text-center">
+                                                                                        <button class="btn calculate-btn btn-primary mb-2" onclick="">Show result</button>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </form>
+                                                                            <div class="result">
+                                                                                <p>
+                                                                                    <span class="given-amount"></span>
+                                                                                    <span class="base-currency"></span>
+                                                                                    <span class="final-result just-grd"></span>
+                                                                                    <span class="second-currency just-grd"></span>
+                                                                                </p>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@endsection
+@push('js')
+<script src="{{ asset('frontend/asset') }}/js/jquery-ui.min.js"></script>
+<script src="{{ asset('js/')}}/validate.js"></script>
+<script src="{{ asset('js/')}}/additional.js"></script>
+<script src="{{ asset('assets/casino_user/js/profile.js')}}"></script>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+ var lol = "<?php echo config('services.stripe.key'); ?>";    
+ // Create a Stripe client.
+var stripe = Stripe(lol);
+
+// Create an instance of Elements.
+var elements = stripe.elements();
+
+// Custom styling can be passed to options when creating an Element.
+// (Note that this demo uses a wider set of styles than the guide below.)
+var style = {
+  base: {
+    color: '#fff',
+    fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+    fontSmoothing: 'antialiased',
+    fontSize: '17px',
+    '::placeholder': {
+      color: '#fff'
+    }
+  },
+  invalid: {
+    color: '#fa755a',
+    iconColor: '#fa755a'
+  }
+};
+
+// Create an instance of the card Element.
+var card = elements.create('cardNumber', {
+    classes:{
+        base:"form-control",
+        invalid:"error",
+        focus:"white"
+    },
+    style:style
+});
+var exp = elements.create('cardExpiry', {
+    classes:{
+        base:"form-control",
+        invalid:"error",
+        focus:"white"
+    },
+    style:style
+});
+var cvc = elements.create('cardCvc', {
+    classes:{
+        base:"form-control",
+        invalid:"error",
+        focus:"white"
+    },
+    style:style
+});
+
+// Add an instance of the card Element into the `card-element` <div>.
+card.mount('#card-element');
+exp.mount('#card-exp');
+cvc.mount('#card-cvc');
+
+// Handle real-time validation errors from the card Element.
+card.addEventListener('change', function(event) {
+  var displayError = document.getElementById('card-errors');
+  if (event.error) {
+    displayError.textContent = event.error.message;
+  } else {
+    displayError.textContent = '';
+  }
+});
+
+// Handle form submission.
+var form = document.getElementById('payment-form');
+form.addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  stripe.createToken(card).then(function(result) {
+    if (result.error) {
+      // Inform the user if there was an error.
+      var errorElement = document.getElementById('card-errors');
+      errorElement.textContent = result.error.message;
+    } else {
+      // Send the token to your server.
+      stripeTokenHandler(result.token);
+    }
+  });
+});
+
+// Submit the form with the token ID.
+function stripeTokenHandler(token) {
+  // Insert the token ID into the form so it gets submitted to the server
+  var form = document.getElementById('payment-form');
+  var hiddenInput = document.createElement('input');
+  hiddenInput.setAttribute('type', 'hidden');
+  hiddenInput.setAttribute('name', 'stripeToken');
+  hiddenInput.setAttribute('value', token.id);
+  form.appendChild(hiddenInput);
+
+  // Submit the form
+  form.submit();
+}
+</script>
+ <script>
+        $(document).ready(function () {
+            if (window.location.hash=="#deposit"){ document.querySelectorAll('.tablinks')[1].click() }
+        });
+    </script>
+@endpush
