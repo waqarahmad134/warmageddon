@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\api;
+
 use App\CoinPayment;
 use App\Deposit;
 use App\PropersixBonus;

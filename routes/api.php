@@ -1,6 +1,16 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\api\UserController;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use App\Models\TokenCurrency;
+use App\Models\Deposit;
+use App\Models\LeaveNote;
+use App\ProsixUserWallet;
+use App\ProsixTransaction;
+use App\TransactionType;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -17,6 +27,159 @@ use Illuminate\Http\Request;
 ////    return $request->user();
 // dd(\Illuminate\Support\Facades\Auth::user());
 //});
+
+Route::get('/waqar2', function () {
+    return response()->json([
+        'message' => 'hi waqar'
+    ]);
+});
+
+function apiResponse($status, $message, $data = null, $error = null, $code = 200) {
+    return response()->json([
+        'status' => $status,
+        'message' => $message,
+        'data' => $data,
+        'error' => $error
+    ], $code);
+}
+
+
+Route::get('/allgames', function () {
+    try {
+        $games = DB::table('add_games')->get();
+        return apiResponse(true, 'Games fetched successfully', $games);
+    } catch (\Exception $e) {
+        return apiResponse(false, 'Failed to fetch games', null, $e->getMessage(), 500);
+    }
+});
+
+Route::get('/allusers', function () {
+    try {
+        $perPage = request()->get('per_page', 20);
+        $users = DB::table('users')->paginate($perPage);
+
+        return apiResponse(true, 'Users fetched successfully', $users);
+    } catch (\Exception $e) {
+        return apiResponse(false, 'Failed to fetch users', null, $e->getMessage(), 500);
+    }
+});
+
+Route::post('/newlogin', function (Request $request) {
+    try {
+        return "ok";
+        // Validation
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return apiResponse(false, 'Validation failed', null, $validator->errors(), 422);
+        }
+
+        // Find user (by email OR username)
+        $user = User::where('email', $request->email)
+                    ->orWhere('user_name', $request->email)
+                    ->first();
+
+        if (!$user) {
+            return apiResponse(false, 'Invalid credentials', null, null, 401);
+        }
+
+        // Verify password
+        if (!Hash::check($request->password, $user->password)) {
+            return apiResponse(false, 'Invalid credentials', null, null, 401);
+        }
+
+        // Create token (using Laravel Sanctum or Passport)
+        $token = $user->createToken('api_token')->plainTextToken;
+
+        return apiResponse(true, 'Login successful', [
+            'user' => $user,
+            'token' => $token,
+        ]);
+    } catch (\Exception $e) {
+        return apiResponse(false, 'Login failed', null, $e->getMessage(), 500);
+    }
+});
+
+
+
+Route::post('/add-user-token/{id}', function (Request $request, $id) {
+    try {
+        $request->validate([
+            'add_token' => 'required|numeric|min:1',
+        ]);
+
+        $tok = TokenCurrency::where(['status' => 1, 'doller' => 1])->first();
+        if (!$tok) {
+            return apiResponse(false, 'Token currency not found', null, null, 404);
+        }
+
+        $user = User::find($id);
+        if (!$user) {
+            return apiResponse(false, 'User not found', null, null, 404);
+        }
+
+        // Create or update wallet
+        $userWallet = ProsixUserWallet::updateOrCreate(
+            ['user_id' => $id],
+            ['usd' => 0, 'token' => 0]
+        );
+
+        // Deposit record
+        $deposit = new Deposit();
+        $deposit->user_id = $id;
+        $deposit->type = 'admin';
+        $deposit->charge_id = 'ch_' . Str::random(20);
+        $deposit->amount = round($request->add_token / $tok->pley6_token);
+        $deposit->from = 'Casino';
+        $deposit->to = $user->user_name;
+        $deposit->save();
+
+        // Update wallet
+        $userWallet->usd += $request->add_token / $tok->pley6_token;
+        $userWallet->token += $request->add_token;
+        $userWallet->save();
+
+        // Transaction type
+        $tran_Type = new TransactionType();
+        $tran_Type->type = 'add_token';
+        $tran_Type->created_by = null;
+        $tran_Type->save();
+
+        // Transaction
+        $transaction = new ProsixTransaction();
+        $transaction->user_id = $id;
+        $transaction->amount = $request->add_token;
+        $transaction->currency = 'pley6_token';
+        $transaction->from = 'casino';
+        $transaction->type = $tran_Type->id;
+        $transaction->to = $user->user_name;
+        $transaction->created_by = null;
+        $transaction->save();
+
+        // Leave note
+        $note = new LeaveNote();
+        $note->user_id = $id;
+        $note->body = 'You received bonus of ' . $request->add_token . ' tokens from Casino';
+        $note->status = 0;
+        $note->save();
+
+        return apiResponse(true, 'Tokens added successfully', [
+            'wallet' => [
+                'usd' => $userWallet->usd,
+                'token' => $userWallet->token,
+            ],
+            'deposit' => $deposit,
+            'transaction' => $transaction,
+        ]);
+    } catch (\Exception $e) {
+        return apiResponse(false, 'Failed to add tokens', null, $e->getMessage(), 500);
+    }
+});
+
+
 Route::group(['middleware' => ['guest:api'],'namespace' => 'api'], function () {
 
 });

@@ -512,6 +512,7 @@ class AddGamesController extends Controller
 
 
         }catch (\Exception $e) {
+            dd($e);
             Toastr::error('Something went wrong please try again!');
             return redirect()->back();
         }
@@ -588,6 +589,7 @@ class AddGamesController extends Controller
                 return redirect('/');
             }
         }catch (\Exception $e) {
+            dd($e);
             Toastr::error('Something went wrong please try again!');
             return redirect()->back();
         }

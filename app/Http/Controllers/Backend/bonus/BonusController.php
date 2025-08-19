@@ -506,6 +506,8 @@ class BonusController extends Controller
         $bonus_list            = Bonus::where('add_bonus_id','!=',null)->with('add_bonus','user')->get();
         return view('backend.bonus.propersix_bonus',compact('bonus_list'));
     }
+
+    
     public function add_user_token(Request $request , $id){
         $tok = TokenCurrency::where(['status'=>1,'doller'=>1])->first();
         $userWallet=\App\ProsixUserWallet::updateOrCreate(['user_id'=>$id]);
