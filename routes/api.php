@@ -97,8 +97,14 @@ Route::post('/newlogin', function (Request $request) {
             'token' => $token,
         ]);
     } catch (\Exception $e) {
-        return apiResponse(false, 'Login failed', null, $e->getMessage(), 500);
+        return response()->json([
+            'success' => false,
+            'message' => 'Login failed',
+            'error'   => $e->getMessage(),
+            'trace'   => $e->getTraceAsString(), // 👈 shows exact line
+        ], 500);
     }
+    
 });
 
 
