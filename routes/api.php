@@ -3,10 +3,10 @@
 use Illuminate\Http\Request;
 use App\Http\Controllers\api\UserController;
 use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use App\Models\TokenCurrency;
-use App\Models\Deposit;
-use App\Models\LeaveNote;
+use App\User;
+use App\TokenCurrency;
+use App\Deposit;
+use App\LeaveNote;
 use App\ProsixUserWallet;
 use App\ProsixTransaction;
 use App\TransactionType;
