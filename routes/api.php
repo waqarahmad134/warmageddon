@@ -66,8 +66,6 @@ Route::get('/allusers', function () {
 
 Route::post('/newlogin', function (Request $request) {
     try {
-        return "ok";
-        // Validation
         $validator = Validator::make($request->all(), [
             'email' => 'required|string',
             'password' => 'required|string',
