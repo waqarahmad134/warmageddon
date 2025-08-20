@@ -21,7 +21,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
-        \App\Http\Middleware\CorsMiddleware::class, 
+        // \App\Http\Middleware\CorsMiddleware::class, 
     ];
 
     /**
@@ -46,6 +46,8 @@ class Kernel extends HttpKernel
             \Illuminate\Session\Middleware\StartSession::class,
             'throttle:60,1',
             'bindings',
+            \App\Http\Middleware\CorsMiddleware::class, // keep only here
+
         ],
     ];
 
@@ -75,7 +77,7 @@ class Kernel extends HttpKernel
         'role' => \Spatie\Permission\Middlewares\RoleMiddleware::class,
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
-        'cors' => \App\Http\Middleware\CorsMiddleware::class,
+        // 'cors' => \App\Http\Middleware\CorsMiddleware::class,
         'language' => Language::class,
     ];
 
