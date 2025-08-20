@@ -16,6 +16,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        error_reporting(E_ALL & ~E_USER_DEPRECATED);
+        if (app()->environment('production')) {
+            error_reporting(E_ALL & ~E_USER_DEPRECATED & ~E_NOTICE & ~E_WARNING);
+        }
         /* if ($this->app->environment() !== 'production') {
             $this->app->register(\Way\Generators\GeneratorsServiceProvider::class);
             $this->app->register(\Xethron\MigrationsGenerator\MigrationsGeneratorServiceProvider::class);
