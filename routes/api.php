@@ -90,7 +90,9 @@ Route::post('/newlogin', function (Request $request) {
         }
 
         // Create token (using Laravel Sanctum or Passport)
-        $token = $user->createToken('api_token')->plainTextToken;
+        $token = $user->createToken('MyApp')->accessToken;
+
+        // $token = $user->createToken('api_token')->plainTextToken;
 
         return apiResponse(true, 'Login successful', [
             'user' => $user,

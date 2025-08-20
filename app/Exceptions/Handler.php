@@ -33,11 +33,15 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param  \Exception  $exception
+     * @param  \Throwable|\Exception  $exception
      * @return void
      */
-    public function report(Exception $exception)
+    public function report($exception)
     {
+        // Ignore deprecation warnings
+        if ($exception instanceof \ErrorException && $exception->getSeverity() === E_USER_DEPRECATED) {
+            return;
+        }
 
         parent::report($exception);
     }
@@ -46,27 +50,32 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
+     * @param  \Throwable|\Exception  $exception
      * @return \Illuminate\Http\Response
      */
-    public function render($request, Exception $exception)
+    public function render($request, $exception)
     {
-
+        // Handle 404
         if ($exception instanceof NotFoundHttpException) {
-
             return redirect('error/404');
         }
+
+        // Handle wrong HTTP method
         if ($exception instanceof MethodNotAllowedHttpException) {
-           return redirect('/');
+            return redirect('/');
         }
 
+        // Handle CSRF token mismatch
         if ($exception instanceof \Illuminate\Session\TokenMismatchException) {
             return redirect()->route('login');
         }
+
+        // Handle Spatie Permission Unauthorized Exception
         if ($exception instanceof \Spatie\Permission\Exceptions\UnauthorizedException) {
-            Toastr::error('Sorry! You don not have right permission','Error');
+            Toastr::error('Sorry! You do not have the right permission', 'Error');
             return redirect()->back();
         }
+
         return parent::render($request, $exception);
     }
 }
