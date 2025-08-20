@@ -4,7 +4,7 @@
     </IfModule>
 
     <Files .env>
-        order allow,deny
+        Order allow,deny
         Deny from all
     </Files>
 
@@ -13,10 +13,6 @@
     # Force HTTPS
     RewriteCond %{HTTPS} !=on
     RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-    # Forward OPTIONS requests to Laravel
-    RewriteCond %{REQUEST_METHOD} OPTIONS
-    RewriteRule ^ index.php [QSA,L]
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
@@ -27,7 +23,7 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Handle Front Controller...
+    # Laravel Front Controller
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
